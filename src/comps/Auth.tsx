@@ -7,17 +7,21 @@ const Auth = (props: Props) => {
   const { data: session } = useSession();
   if (session?.user.email) {
     return (
-      <div>
-        <p>{session?.user.email}</p>
-        <p>{session?.user.id}</p>
+      <div className="flex flex-col gap-2">
+        <p>Email: {session?.user.email}</p>
+        <p>User ID: {session?.user.id}</p>
 
-        <button onClick={() => signOut()}>Sign out with Google</button>
+        <button onClick={() => signOut()} className="redbtn">
+          Logout
+        </button>
       </div>
     );
   }
   return (
     <>
-      <button onClick={() => signIn("google")}>Sign in with Google</button>
+      <button onClick={() => signIn("google")} className="greenbtn">
+        Login
+      </button>
     </>
   );
 };
