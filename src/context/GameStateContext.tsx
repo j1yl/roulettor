@@ -25,23 +25,21 @@ interface GameStateContextValue {
   setGameState: React.Dispatch<React.SetStateAction<GameState>>;
 }
 
+interface GameProviderProps {
+  children: React.ReactNode;
+}
+
 const GameStateContext = createContext<GameStateContextValue | undefined>(
   undefined
 );
 
 export const useGameState = () => {
   const context = useContext(GameStateContext);
-
   if (context === undefined) {
     throw new Error("useGameState must be used within a GameStateProvider");
   }
-
   return context;
 };
-
-interface GameProviderProps {
-  children: React.ReactNode;
-}
 
 export const GameStateProvider = ({ children }: GameProviderProps) => {
   const [gameState, setGameState] = useState<GameState>({

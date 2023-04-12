@@ -1,9 +1,10 @@
-# roulettor
+# Roulettor Frontend
 
-## description
+## Description
 
-gambling site
+- This folder contains the Frontend for roulettor.com
 
-- dice
-- coinflip
-- roulette
+## Technology
+
+- NextJS [https://beta.nextjs.org/docs](https://beta.nextjs.org/docs)
+- ReactJS [https://react.dev/](https://react.dev/)
