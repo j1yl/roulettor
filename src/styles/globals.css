@@ -3,9 +3,17 @@
 @tailwind utilities;
 
 .redbtn {
-  @apply w-max px-4 py-2 font-semibold bg-red-400 rounded-xl
+  @apply w-max px-2 py-1 font-semibold bg-red-400 rounded-lg
 }
 
 .greenbtn {
-  @apply w-max px-4 py-2 font-semibold bg-green-400 rounded-xl
+  @apply w-max px-2 py-1 font-semibold bg-green-400 rounded-lg
+}
+
+.betbtn {
+  @apply w-max px-2 py-1 bg-slate-100 rounded-lg active:bg-slate-300 transition-all
+}
+
+.choicebtn {
+  @apply w-full rounded-lg p-4 transition-all active:scale-95 duration-200
 }
