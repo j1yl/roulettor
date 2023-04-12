@@ -6,7 +6,7 @@ const Navbar = () => {
   return (
     <nav className="mx-auto flex max-w-screen-xl items-center justify-between gap-4 p-2">
       <div>
-        <Link href="/">Gamblo</Link>
+        <Link href="/">roulettor</Link>
       </div>
       <div className="flex gap-4">
         <Link href="/">Home</Link>

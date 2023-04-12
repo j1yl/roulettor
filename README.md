@@ -1,4 +1,4 @@
-# gamblo
+# roulettor
 
 ## description
 
