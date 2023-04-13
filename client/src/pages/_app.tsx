@@ -11,6 +11,7 @@ const pop = Poppins({
 import "~/styles/globals.css";
 import Navbar from "~/components/Navbar";
 import { UserStateProvider } from "~/context/UserContext";
+import { GameStateProvider } from "~/context/GameStateContext";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -19,10 +20,12 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <div className={pop.className}>
       <SessionProvider session={session}>
-        <UserStateProvider>
-          <Navbar />
-          <Component {...pageProps} />
-        </UserStateProvider>
+        <GameStateProvider>
+          <UserStateProvider>
+            <Navbar />
+            <Component {...pageProps} />
+          </UserStateProvider>
+        </GameStateProvider>
       </SessionProvider>
     </div>
   );

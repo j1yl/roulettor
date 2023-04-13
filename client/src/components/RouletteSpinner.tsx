@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useGameState } from "~/context/GameStateContext";
 
 // w-20 = 80px
 const redslot =
@@ -10,6 +11,16 @@ const greenslot =
 
 const Spinner = () => {
   const myWheel = useRef<HTMLDivElement>(null);
+  const gameState = useGameState();
+
+  useEffect(() => {
+    if (
+      gameState.gameState.gameState === "ENDED" &&
+      gameState.gameState.winningValue
+    ) {
+      spinWheel(gameState.gameState.winningValue);
+    }
+  }, [gameState]);
 
   let choiceArray = [0, 11, 5, 10, 6, 9, 7, 8, 1, 14, 2, 13, 3, 12, 4];
 
@@ -31,7 +42,7 @@ const Spinner = () => {
     if (myWheel.current) {
       myWheel.current.style.transitionTimingFunction =
         "cubic-bezier(0," + object.x + "," + object.y + ",1)";
-      myWheel.current.style.transitionDuration = "0.5s";
+      myWheel.current.style.transitionDuration = "5s";
       myWheel.current.style.transform =
         "translate3d(-" + landingPosition + "px, 0px, 0px)";
     }
@@ -44,7 +55,7 @@ const Spinner = () => {
         myWheel.current.style.transform =
           "translate3d(" + resetTo + "px, 0px, 0px)";
       }
-    }, 0.5 * 1000);
+    }, 5 * 1000);
   };
 
   return (
