@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "~/server/db";
+import { useUserState } from "~/context/UserContext";
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +21,9 @@ export default async function handler(
     });
     return;
   }
+
   let user;
+
   try {
     user = await prisma.user.findUnique({
       where: {

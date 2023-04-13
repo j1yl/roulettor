@@ -12,13 +12,11 @@ export default async function handler(
   }
 
   try {
-    // Get the most recent game
-    const game = await prisma.game.findFirst({
+    const game = await prisma.gameInfo.findFirst({
       orderBy: { createdAt: "desc" },
       include: { bets: true },
     });
 
-    // If there's no game yet, return an error
     if (!game) {
       return res
         .status(404)
@@ -26,21 +24,11 @@ export default async function handler(
     }
 
     // Return the game info
-    res.status(200).json({
-      id: game.id,
-      wheelColor: game.wheelColor,
-      wheelValue: game.wheelValue,
-      bets: game.bets.map((bet) => ({
-        id: bet.id,
-        userId: bet.userId,
-        gameId: bet.gameId,
-        betType: bet.betType,
-        betAmount: bet.betAmount,
-        payout: bet.payout,
-        createdAt: bet.createdAt,
-        updatedAt: bet.updatedAt,
-      })),
-    });
+    // res.status(200).json({
+    //   id: game.id,
+    //   wheelColor: game.wheelColor,
+    //   wheelValue: game.wheelValue,
+    // });
   } catch (error) {
     console.error(error);
     res.status(500).json({ status: "error", message: "Internal server error" });

@@ -61,24 +61,23 @@ model User {
   bets          Bet[]
 }
 
-model Game {
-  id         String   @id @default(cuid())
-  wheelColor String
-  wheelValue Int
-  createdAt  DateTime @default(now())
-  bets       Bet[]
+model GameInfo {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  gameState    String
+  winningColor String
+  winningValue Int
+  bets         Bet[]
 }
 
 model Bet {
   id        String   @id @default(cuid())
   userId    String
   gameId    String
-  betType   String
+  betColor  String
   betAmount Float
-  payout    Float
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
-  game Game @relation(fields: [gameId], references: [id])
+  user User     @relation(fields: [userId], references: [id])
+  game GameInfo @relation(fields: [gameId], references: [id])
 }
