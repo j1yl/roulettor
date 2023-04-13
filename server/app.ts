@@ -21,8 +21,11 @@ io.on("connection", (socket) => {
 });
 
 httpServer.listen(3001, () => {
-  console.log(`Server is running on port 3001`);
-  timer.start({ precision: "seconds" });
+  timer.start({
+    precision: "seconds",
+    countdown: true,
+    startValues: { seconds: 65 },
+  });
 });
 
 /**
@@ -31,10 +34,21 @@ httpServer.listen(3001, () => {
  *
  */
 interface GameInfo {
+  timeRemaining: number;
   id: string;
   gameState?: "STARTED" | "ENDED";
   winningColor?: "red" | "black" | "green" | "none";
   winningValue?: number;
+  bets: [];
+}
+
+interface BetInfo {
+  id: string;
+  userId: string;
+  gameId: string;
+  betColor: string;
+  betAmount: number;
+  createdAt: Date;
 }
 
 let gameData = {} as GameInfo;
@@ -60,30 +74,57 @@ const getWinningColor = (value: number) => {
   }
 };
 
-const sendGameStageUpdate = (data: GameInfo) => {
-  io.emit("gameStageUpdate", data);
-  console.log("Emitted gameStageUpdate", data);
+const sendGameUpdate = (data: GameInfo) => {
+  io.emit("gameUpdate", data);
+  console.log(new Date().toUTCString(), "Emitted gameUpdate", data);
+};
+
+const sendTimeUpdate = (currentSeconds: number) => {
+  io.emit("timeUpdate", currentSeconds);
+  // console.log(new Date().toUTCString(), "Emitted timeUpdate", currentSeconds);
 };
 
 timer.addEventListener("secondsUpdated", async (e) => {
   let currentSeconds = timer.getTimeValues().seconds;
-  console.log(currentSeconds);
+  gameData.timeRemaining = currentSeconds;
+  // console.log(timer.getTimeValues().toString());
+  sendTimeUpdate(Math.abs(currentSeconds - 60));
 
-  if (currentSeconds === 5) {
+  if (timer.getTimeValues().toString() === "00:01:00") {
+    // CREATE NEW GAME
+    gameData.timeRemaining = 59;
     gameData.gameState = "STARTED";
-    sendGameStageUpdate(gameData);
-  } else if (currentSeconds === 10) {
+    sendGameUpdate(gameData);
+  } else if (timer.getTimeValues().toString() === "00:00:00") {
+    // END GAME
     gameData.gameState = "ENDED";
-    gameData.winningValue = getRandomInt(37);
+    gameData.winningValue = getRandomInt(14);
     gameData.winningColor = getWinningColor(gameData.winningValue);
+
     try {
       const res = await axios.post(
         "http://localhost:3000/api/roulette/save",
         gameData
       );
-      sendGameStageUpdate(res.data.data);
+
+      res.data.data.timeRemaining = 60 - gameData.timeRemaining;
+      sendGameUpdate(res.data.data);
     } catch (e) {
       console.error(e);
     }
   }
+});
+
+timer.addEventListener("targetAchieved", () => {
+  console.log("Pausing for 5 seconds");
+  timer.pause();
+  setTimeout(() => {
+    console.log("Resuming", timer.getTimeValues().toString());
+    timer.reset();
+    timer.start({
+      precision: "seconds",
+      countdown: true,
+      startValues: { seconds: 65 },
+    });
+  }, 5000);
 });
