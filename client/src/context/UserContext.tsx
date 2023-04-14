@@ -1,6 +1,10 @@
-import axios from "axios";
-import { useSession } from "next-auth/react";
 import React, { useState, createContext, useContext, useEffect } from "react";
+
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3001", {
+  autoConnect: false,
+});
 
 interface UserState {
   balance: number;
@@ -28,21 +32,16 @@ const UserStateProvider: React.FC<UserStateProviderProps> = ({
   children,
 }: UserStateProviderProps) => {
   const [userState, setUserState] = useState<UserState>(defaultUserState);
-  const { data: session } = useSession();
+
   useEffect(() => {
-    if (session) {
-      axios
-        .get("/api/user/" + session?.user.id)
-        .then((res) => {
-          setUserState({
-            balance: res.data.user.balance,
-          });
-        })
-        .catch((e) => {
-          console.error(e);
-        });
-    }
-  }, [session]);
+    socket.connect();
+    socket.on("betReceived", (data: number) => {
+      setUserState({ balance: data });
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
 
   return (
     <UserStateContext.Provider

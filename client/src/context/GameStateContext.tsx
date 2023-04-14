@@ -6,11 +6,12 @@ const socket = io("http://localhost:3001", {
 });
 
 interface GameState {
-  timeRemaining: number;
+  id: string;
   gameState: "STARTED" | "ENDED";
   winningColor?: "red" | "black" | "green" | "none";
   winningValue?: number;
   bets: BetInfo[];
+  timeRemaining?: number;
 }
 
 interface BetInfo {
@@ -28,11 +29,12 @@ interface GameStateContextType {
 }
 
 const defaultGameState: GameState = {
-  timeRemaining: 59,
+  id: "",
   gameState: "STARTED",
   winningColor: "none",
   winningValue: 0,
   bets: [],
+  timeRemaining: 0,
 };
 
 const GameStateContext = createContext<GameStateContextType>({
@@ -54,10 +56,6 @@ const GameStateProvider: React.FC<GameStateProviderProps> = ({
     socket.on("gameUpdate", (data: GameState) => {
       setGameState({ ...data });
     });
-    socket.on("betPlaced", (data: BetInfo) => {
-      gameState.bets.push(data);
-    });
-
     return () => {
       socket.disconnect();
     };
