@@ -72,11 +72,13 @@ model GameInfo {
 
 model Bet {
   id        String   @id @default(cuid())
+  status    String
   userId    String
   gameId    String
   betColor  String
   betAmount Float
   createdAt DateTime @default(now())
+  payout    Int      @default(0)
 
   user User     @relation(fields: [userId], references: [id])
   game GameInfo @relation(fields: [gameId], references: [id])

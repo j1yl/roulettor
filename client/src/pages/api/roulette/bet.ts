@@ -1,5 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "~/server/db";
+import { Bet } from "@prisma/client";
+
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3001");
 
 export default async function createBet(
   req: NextApiRequest,
@@ -13,9 +18,10 @@ export default async function createBet(
     return;
   }
 
-  const { userId, gameId, betAmount, betType } = req.body;
+  const { userId, gameId, betAmount, betColor, status, payout } =
+    req.body as Bet;
 
-  if (!userId || !gameId || !betAmount || !betType) {
+  if (!userId || !gameId || !betAmount || !betColor) {
     res.status(400).json({
       status: "error",
       message: "Missing required fields",
@@ -23,10 +29,8 @@ export default async function createBet(
     return;
   }
 
-  let user;
-
   try {
-    user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId,
       },
@@ -47,8 +51,9 @@ export default async function createBet(
         userId,
         gameId,
         betAmount,
-        betType,
-        payout: 0,
+        betColor,
+        status,
+        payout,
       },
     });
 
@@ -65,9 +70,10 @@ export default async function createBet(
 
     res.status(200).json({
       status: "ok",
-      message: "Bet created",
       bet,
     });
+
+    socket.emit("betPlaced", bet);
   } catch (e) {
     console.error(e);
     res.status(500).json({ status: "error", message: "Internal server error" });
