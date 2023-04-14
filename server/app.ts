@@ -110,7 +110,7 @@ const sendGameUpdate = (data: GameInfo) => {
   );
 };
 
-timer.addEventListener("secondsUpdated", (e) => {
+timer.addEventListener("secondsUpdated", async (e) => {
   gameData = {
     ...gameData,
     timeRemaining: timer.getTimeValues().seconds,
@@ -140,32 +140,28 @@ timer.addEventListener("secondsUpdated", (e) => {
     gameData.gameState = "ENDED";
     gameData.winningValue = getRandomInt(14); // change to more secure random number gen
     gameData.winningColor = getWinningColor(gameData.winningValue);
-    /**
-     * PAYOUT
-     */
-    try {
-      axios.get("http://localhost:3000/api/roulette/payout").then((res) => {});
-    } catch (e) {
-      console.error(e);
-    }
 
-    gameData.bets.forEach((item) => {
+    gameData.bets.forEach(async (item) => {
       if (item.betColor === gameData.winningColor) {
         item.status = "won";
       } else {
         item.status = "lost";
       }
-      try {
-        axios
-          .post("http://localhost:3000/api/roulette/save/bet", item)
-          .then((res) => {
-            // payout !!!
-            gameData.bets = [];
-          });
-      } catch (e) {
-        console.error(e);
+
+      await axios.post("http://localhost:3000/api/roulette/save/bet", item);
+
+      if (item.status === "won") {
+        await axios.post("http://localhost:3000/api/roulette/payout", {
+          status: item.status,
+          userId: item.userId,
+          payout: item.payout,
+          betAmount: item.betAmount,
+        });
       }
     });
+
+    // clear in memory bets after game ends
+    gameData.bets = [];
 
     try {
       axios
