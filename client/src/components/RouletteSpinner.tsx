@@ -2,12 +2,9 @@ import { useEffect, useRef } from "react";
 import { useGameState } from "~/context/GameStateContext";
 
 // w-20 = 80px
-const redslot =
-  "w-[75px] h-[75px] m-[3px] bg-red-700 rounded-lg aspect-square flex justify-center items-center text-2xl";
-const blackslot =
-  "w-[75px] h-[75px] m-[3px] bg-black rounded-lg aspect-square flex justify-center items-center text-2xl";
-const greenslot =
-  "w-[75px] h-[75px] m-[3px] bg-green-500 rounded-lg aspect-square flex justify-center items-center text-2xl";
+
+const slot =
+  "w-[75px] h-[75px] m-[3px] rounded-lg aspect-square flex justify-center items-center";
 
 const Spinner = () => {
   const myWheel = useRef<HTMLDivElement>(null);
@@ -60,32 +57,32 @@ const Spinner = () => {
 
   return (
     <>
-      <div className="relative mx-auto flex w-full justify-center overflow-hidden">
+      <div className="relative mx-auto flex w-full justify-center overflow-hidden rounded-lg">
         <div ref={myWheel} className="flex gap-2">
           {Array.from({ length: 29 }, (_, i) => i).map((_, i) =>
             choiceArray.map((item, index) => {
               if (item === 0)
                 return (
-                  <div className={greenslot} key={index}>
+                  <div className={slot + " bg-green-600"} key={index}>
                     <p>{item}</p>
                   </div>
                 );
               if (item % 2 === 1)
                 return (
-                  <div className={redslot} key={index}>
+                  <div className={slot + " bg-red-700"} key={index}>
                     <p>{item}</p>
                   </div>
                 );
               if (item % 2 === 0)
                 return (
-                  <div className={blackslot} key={index}>
+                  <div className={slot + " bg-zinc-900"} key={index}>
                     <p>{item}</p>
                   </div>
                 );
             })
           )}
         </div>
-        <div className="z-2 absolute left-1/2 h-full w-[6px] bg-white"></div>
+        <div className="z-2 absolute left-1/2 top-0 h-full w-[3px] rounded-lg bg-zinc-50"></div>
       </div>
     </>
   );
