@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useUserState } from "~/context/UserContext";
-import axios from "axios";
 
 const Auth = () => {
   const { data: session } = useSession();
+  const [balance, setBalance] = useState<number>(0);
+
   const { userState } = useUserState();
-  const [balance, setBalance] = useState(0);
 
   useEffect(() => {
-    if (session?.user.id) {
-      axios.get("/api/user/" + session.user.id).then((res) => {
-        userState.balance = res.data.user.balance;
-        setBalance(userState.balance);
-      });
-    }
-  }, [session]);
+    setBalance(userState.balance);
+  }, [userState]);
 
   if (session?.user) {
     return (
