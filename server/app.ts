@@ -45,16 +45,13 @@ io.on("connection", (socket) => {
   console.log(">>>>>USER CONNECTED", socket.id);
   socket.on("betPlaced", (data: BetInfo) => {
     gameData.bets.push(data);
-    // {
-    //   id: 'clgft1bsj0003liz5und7hovi',
-    //   status: 'pending',
-    //   userId: 'clgfp0jlb000ulifi47ckhaxn',
-    //   gameId: 'clgft15cg0000liz5azljwc28',
-    //   betColor: 'green',
-    //   betAmount: 100,
-    //   createdAt: '2023-04-14T00:22:06.835Z'
-    // }
-    socket.emit("betReceived", gameData.bets);
+    try {
+      axios.get(`http://localhost:3000/api/user/${data.userId}`).then((res) => {
+        socket.emit("betReceived", res.data.user);
+      });
+    } catch (e) {
+      console.error(e);
+    }
   });
 });
 
