@@ -4,27 +4,102 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <nav className="mx-auto flex max-w-screen-xl items-center justify-between gap-4 p-4">
-      <div className="flex w-full items-center gap-2">
-        <Link href="/" className="text-2xl font-bold">
+    <div className="navbar">
+      <div className="navbar-start">
+        <div className="dropdown">
+          <label tabIndex={0} className="btn-ghost btn lg:hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h8m-8 6h16"
+              />
+            </svg>
+          </label>
+          <ul
+            tabIndex={0}
+            className="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow"
+          >
+            <li>
+              <Link href="/">Home</Link>
+            </li>
+            <li tabIndex={0}>
+              <Link href="games" className="justify-between">
+                Games
+                <svg
+                  className="fill-current"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+                </svg>
+              </Link>
+              <ul className="p-2">
+                <li>
+                  <Link href="/roulette">Roulette</Link>
+                </li>
+                <li>
+                  <Link href="/dice">Dice</Link>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <Link href="/faq">FAQ</Link>
+            </li>
+          </ul>
+        </div>
+        <Link
+          className="btn-ghost btn text-xl normal-case text-primary"
+          href="/"
+        >
           Roulettor.com
         </Link>
-        <div className="ml-4 flex justify-center gap-4">
-          <Link href="/" className="navlink">
-            Home
-          </Link>
-          <Link href="/roulette" className="navlink">
-            Roulette
-          </Link>
-          <Link href="/faq" className="navlink">
-            FAQ
-          </Link>
-        </div>
       </div>
-      <div className="flex w-full justify-end">
+      <div className="navbar-center hidden lg:flex">
+        <ul className="menu menu-horizontal px-1">
+          <li>
+            <Link href="/">Home</Link>
+          </li>
+          <li tabIndex={0}>
+            <Link href="/games">
+              Games
+              <svg
+                className="fill-current"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+              >
+                <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+              </svg>
+            </Link>
+            <ul className="p-2">
+              <li>
+                <Link href="/roulette">Roulette</Link>
+              </li>
+              <li>
+                <Link href="/dice">Dice</Link>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <Link href="/faq">FAQ</Link>
+          </li>
+        </ul>
+      </div>
+      <div className="navbar-end">
         <Auth />
       </div>
-    </nav>
+    </div>
   );
 };
 
