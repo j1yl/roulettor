@@ -28,13 +28,15 @@ const RouletteBetting = () => {
   });
 
   const handleBet = async () => {
-    try {
-      betObject.gameId = gameState.id;
-      betObject.userId = session?.user.id as string;
-      const res = await axios.post("/api/roulette/bet", betObject);
-    } catch (e) {
-      console.error(e);
-    }
+    betObject.gameId = gameState.id;
+    betObject.userId = session?.user.id as string;
+    setTimeout(async () => {
+      try {
+        const res = await axios.post("/api/roulette/bet", betObject);
+      } catch (e) {
+        console.error(e);
+      }
+    }, 1 * 1000);
   };
 
   return (

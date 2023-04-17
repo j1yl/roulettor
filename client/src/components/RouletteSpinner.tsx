@@ -36,10 +36,12 @@ const Spinner = () => {
       y: Math.floor(Math.random() * 20) / 100,
     };
 
+    let resetPosition = -(position * card + 700); // + randomize
+
     if (myWheel.current) {
       myWheel.current.style.transitionTimingFunction =
         "cubic-bezier(0," + object.x + "," + object.y + ",1)";
-      myWheel.current.style.transitionDuration = "5s";
+      myWheel.current.style.transitionDuration = "6s";
       myWheel.current.style.transform =
         "translate3d(-" + landingPosition + "px, 0px, 0px)";
     }
@@ -48,11 +50,10 @@ const Spinner = () => {
       if (myWheel.current) {
         myWheel.current.style.transitionTimingFunction = "";
         myWheel.current.style.transitionDuration = "";
-        let resetTo = -(position * card + 700); // + randomize
         myWheel.current.style.transform =
-          "translate3d(" + resetTo + "px, 0px, 0px)";
+          "translate3d(" + resetPosition + "px, 0px, 0px)";
       }
-    }, 5 * 1000);
+    }, 6 * 1000);
   };
 
   return (
@@ -66,7 +67,7 @@ const Spinner = () => {
                   <div className={slot + " bg-green-800"} key={index}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      enable-background="new 0 0 1024 1024"
+                      enableBackground="new 0 0 1024 1024"
                       viewBox="0 0 1024 1024"
                       className="h-7 w-7 fill-green-600"
                       id="videogame"
@@ -81,7 +82,7 @@ const Spinner = () => {
                   <div className={slot + " bg-primary"} key={index}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      enable-background="new 0 0 512 512"
+                      enableBackground="new 0 0 512 512"
                       viewBox="0 0 512 512"
                       className="h-8 w-8 rotate-45 fill-secondary"
                     >
