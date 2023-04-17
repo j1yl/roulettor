@@ -1,57 +1,66 @@
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { Timer } from "easytimer.js";
-import axios from "axios";
+import winston from "winston";
+import crypto from "crypto";
 
 /**
- *
  * TYPES
- *
  */
-interface GameInfo {
+interface RouletteGameData {
   id: string;
-  timeRemaining: number;
-  gameState?: "STARTED" | "ENDED" | "PREPARING";
-  winningColor?: "red" | "black" | "green" | "none";
-  winningValue?: number;
-  bets: BetInfo[];
+  status: string;
+  clock: string;
+  color?: string;
+  value?: number;
+  bets: RouletteBetData[];
 }
 
-interface BetInfo {
+interface RouletteBetData {
   id: string;
-  status: "won" | "lost" | "pending";
-  userId: string;
   gameId: string;
+  userId: string;
   betColor: string;
   betAmount: number;
   payout: number;
-  createdAt?: Date;
+  status: string;
 }
 
 /**
- *
  * INITIALIZATION
- *
  */
-var timer = new Timer();
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: process.env.CLIENT_URL,
   },
 });
+const timer = new Timer();
+
+const logger = winston.createLogger({
+  level: "info",
+  transports: [
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
+  ],
+});
+
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
+}
 
 io.on("connection", (socket) => {
-  console.log(">>>>>USER CONNECTED", socket.id);
-  socket.on("betPlaced", (data: BetInfo) => {
-    gameData.bets.push(data);
-    try {
-      axios.get(`http://localhost:3000/api/user/${data.userId}`).then((res) => {
-        socket.emit("betReceived", res.data.user);
-      });
-    } catch (e) {
-      console.error(e);
-    }
+  socket.on("placeBet", (data: RouletteBetData) => {
+    rouletteGameData.bets.push(data);
+    // try {
+    //   io.emit("receivedBet")
+    // } catch (e) {
+    //   logger.error(e)
+    // }
   });
 });
 
@@ -63,131 +72,50 @@ httpServer.listen(3001, () => {
   });
 });
 
-/**
- *
- * DEFAULT GAME DATA
- *
- */
-let gameData: GameInfo = {
-  id: "",
-  timeRemaining: 0,
-  gameState: "PREPARING",
-  winningColor: "none",
-  winningValue: 0,
-  bets: [],
-};
+let rouletteGameData = {} as RouletteGameData;
 
 /**
- *
- * GAME LOGIC
- *
+ * HELPER FUNCTIONS
  */
-const getRandomInt = (max: number) => {
-  return Math.floor(Math.random() * max);
+const getRollSpin = (seed: string) => {
+  const hash = crypto.createHmac("sha256", seed).digest("hex");
+  const subHash = hash.substring(0, 8);
+  const spinNumber = parseInt(subHash, 16);
+  return Math.abs(spinNumber) % 15;
 };
 
-const getWinningColor = (value: number) => {
-  if (value === 0) {
-    return "green";
-  } else if (value % 2 === 0) {
-    return "black";
-  } else if (value % 2 === 1) {
+const getRollColor = (spin: number) => {
+  if (spin % 2 === 0) {
     return "red";
-  } else {
-    return "none";
+  } else if (spin % 2 === 1) {
+    return "black";
+  } else if (spin === 0) {
+    return "green";
   }
 };
 
-const sendGameUpdate = (data: GameInfo) => {
-  io.emit("gameUpdate", data);
-  console.log(
-    `TIME: ${data.timeRemaining.toString()}\nGAME UPDATE: ${
-      data.gameState
-    }\nGAME ID: ${data.id}\n`
-  );
-};
+/**
+ * GAME
+ */
+timer.addEventListener("secondsUpdated", () => {
+  rouletteGameData.clock = timer.getTimeValues().toString();
 
-timer.addEventListener("secondsUpdated", async (e) => {
-  gameData = {
-    ...gameData,
-    timeRemaining: timer.getTimeValues().seconds,
-  };
-
-  if (timer.getTimeValues().toString() === "00:01:00") {
-    /**
-     * CREATE NEW GAME
-     */
-    gameData.gameState = "STARTED";
-    try {
-      axios
-        .post("http://localhost:3000/api/roulette/create", gameData)
-        .then((res) => {
-          gameData = {
-            ...gameData,
-            id: res.data.data.id,
-          };
-        });
-    } catch (e) {
-      console.error(e);
-    }
-  } else if (timer.getTimeValues().toString() === "00:00:00") {
-    /**
-     * END GAME
-     */
-    gameData.gameState = "ENDED";
-    gameData.winningValue = getRandomInt(14); // change to more secure random number gen
-    gameData.winningColor = getWinningColor(gameData.winningValue);
-
-    gameData.bets.forEach(async (item) => {
-      if (item.betColor === gameData.winningColor) {
-        item.status = "won";
-      } else {
-        item.status = "lost";
-      }
-
-      await axios.post("http://localhost:3000/api/roulette/save/bet", item);
-
-      if (item.status === "won") {
-        await axios.post("http://localhost:3000/api/roulette/payout", {
-          status: item.status,
-          userId: item.userId,
-          payout: item.payout,
-          betAmount: item.betAmount,
-        });
-      }
-    });
-
-    // clear in memory bets after game ends
-    gameData.bets = [];
-
-    try {
-      axios
-        .post("http://localhost:3000/api/roulette/save/game", gameData)
-        .then((res) => {
-          gameData = {
-            ...gameData,
-            id: res.data.data.id,
-          };
-        });
-    } catch (e) {
-      console.error(e);
-    }
+  if (rouletteGameData.clock === "00:01:00") {
+    rouletteGameData.status = "started";
   }
-  sendGameUpdate(gameData);
+
+  if (rouletteGameData.clock === "00:00:55") {
+    rouletteGameData.status = "ended";
+    rouletteGameData.value = getRollSpin(Date.now().toString());
+    rouletteGameData.color = getRollColor(rouletteGameData.value);
+  }
 });
 
-/**
- *
- * PAUSE THE GAME FOR 5 SECONDS
- *
- */
 timer.addEventListener("targetAchieved", () => {
-  console.log(
-    `TIMER ${timer.getTimeValues().toString()} PAUSING FOR 5 SECONDS`
-  );
+  logger.info("pausing the game (5s)");
   timer.pause();
   setTimeout(() => {
-    console.log(`TIMER ${timer.getTimeValues().toString()} RESUMING THE GAME`);
+    logger.info("resuming the game");
     timer.reset();
     timer.start({
       precision: "seconds",
