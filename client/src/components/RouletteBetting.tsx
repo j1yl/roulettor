@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useGameState } from "~/context/GameStateContext";
 import { useUserState } from "~/context/UserContext";
+import BetDisplay from "./BetDisplay";
 
 interface BetObject {
   status: "won" | "lost" | "pending";
@@ -27,26 +28,24 @@ const RouletteBetting = () => {
   });
 
   const handleBet = async () => {
-    try {
-      betObject.gameId = gameState.id;
-      betObject.userId = session?.user.id as string;
-      const res = await axios.post("/api/roulette/bet", betObject);
-    } catch (e) {
-      console.error(e);
-    }
+    betObject.gameId = gameState.id;
+    betObject.userId = session?.user.id as string;
+    setTimeout(async () => {
+      try {
+        const res = await axios.post("/api/roulette/bet", betObject);
+      } catch (e) {
+        console.error(e);
+      }
+    }, 1 * 1000);
   };
 
   return (
     <>
-      <div className="flex items-center justify-between gap-2 rounded-lg text-sm">
-        <div className="flex w-full items-center gap-2">
-          <span className="rounded-lg bg-zinc-900 px-4 py-2">
-            Amount: {betObject.betAmount}
-          </span>
-        </div>
+      <div className="flex items-center justify-between gap-2 rounded-lg">
+        <span className="w-full">Bet Amount: {betObject.betAmount}</span>
         <div className="flex w-full justify-end gap-2">
           <button
-            className="btn"
+            className="btn-sm btn"
             onClick={() =>
               setBetObject({
                 ...betObject,
@@ -57,7 +56,7 @@ const RouletteBetting = () => {
             Reset
           </button>
           <button
-            className="btn"
+            className="btn-sm btn"
             onClick={() =>
               setBetObject({
                 ...betObject,
@@ -71,7 +70,7 @@ const RouletteBetting = () => {
             +1
           </button>
           <button
-            className="btn"
+            className="btn-sm btn"
             onClick={() =>
               setBetObject({
                 ...betObject,
@@ -85,7 +84,7 @@ const RouletteBetting = () => {
             +10
           </button>
           <button
-            className="btn"
+            className="btn-sm btn"
             onClick={() =>
               setBetObject({
                 ...betObject,
@@ -99,7 +98,7 @@ const RouletteBetting = () => {
             +100
           </button>
           <button
-            className="btn"
+            className="btn-sm btn"
             onClick={() =>
               setBetObject({
                 ...betObject,
@@ -113,7 +112,7 @@ const RouletteBetting = () => {
             1/2
           </button>
           <button
-            className="btn"
+            className="btn-sm btn"
             onClick={() =>
               setBetObject({
                 ...betObject,
@@ -127,7 +126,7 @@ const RouletteBetting = () => {
             x2
           </button>
           <button
-            className="btn"
+            className="btn-sm btn"
             onClick={() =>
               setBetObject({
                 ...betObject,
@@ -147,23 +146,11 @@ const RouletteBetting = () => {
               betObject.payout = 2;
               handleBet();
             }}
-            className="w-full rounded-lg bg-red-700 p-4"
+            className="btn bg-red-800 p-4"
           >
-            Place Bet (Win 2x)
+            Place Bet
           </button>
-          <div className="flex flex-col gap-2">
-            {gameState.bets
-              .filter(() => {
-                return betObject.betColor === "red";
-              })
-              .map((item) => (
-                <div className="flex w-full items-center justify-start rounded-lg bg-zinc-900 p-2">
-                  <span>
-                    {item.userId}: {item.betAmount}
-                  </span>
-                </div>
-              ))}
-          </div>
+          <BetDisplay color="red" />
         </div>
         <div className="flex w-full flex-col gap-2">
           <button
@@ -172,23 +159,11 @@ const RouletteBetting = () => {
               betObject.payout = 14;
               handleBet();
             }}
-            className="w-full rounded-lg bg-green-700 p-4"
+            className="btn bg-green-800 p-4"
           >
-            Place Bet (Win 14x)
+            Place Bet
           </button>
-          <div className="flex flex-col gap-2">
-            {gameState.bets
-              .filter(() => {
-                return betObject.betColor === "green";
-              })
-              .map((item) => (
-                <div className="flex w-full items-center justify-start rounded-lg bg-zinc-900 p-2">
-                  <span>
-                    {item.userId}: {item.betAmount}
-                  </span>
-                </div>
-              ))}
-          </div>
+          <BetDisplay color="green" />
         </div>
         <div className="flex w-full flex-col gap-2">
           <button
@@ -197,23 +172,11 @@ const RouletteBetting = () => {
               betObject.payout = 2;
               handleBet();
             }}
-            className="w-full rounded-lg bg-zinc-900 p-4"
+            className="btn bg-zinc-800 p-4"
           >
-            Place Bet (Win 2x)
+            Place Bet
           </button>
-          <div className="flex flex-col gap-2">
-            {gameState.bets
-              .filter(() => {
-                return betObject.betColor === "black";
-              })
-              .map((item) => (
-                <div className="flex w-full items-center justify-start rounded-lg bg-zinc-900 p-2">
-                  <span>
-                    {item.userId}: {item.betAmount}
-                  </span>
-                </div>
-              ))}
-          </div>
+          <BetDisplay color="black" />
         </div>
       </div>
     </>

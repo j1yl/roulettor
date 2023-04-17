@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  color: rgb(250 250 250);
-  background: rgb(10, 63, 25)
-}
-
 .btn {
-  @apply w-max px-4 py-2 text-sm bg-zinc-900 rounded-lg
+  @apply normal-case font-bold
 }
