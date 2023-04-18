@@ -1,18 +1,12 @@
 import React from "react";
-import { useGameState } from "~/context/GameStateContext";
 
-type Props = {
-  color: "red" | "black" | "green";
-};
-
-const BetDisplay = (props: Props) => {
-  const { gameState } = useGameState();
+const BetDisplay = () => {
 
   return (
     <div className="overflow-x-auto">
       <table className="table w-full">
         <tbody>
-          {gameState.bets
+          {/* {gameState.bets
             .filter((bet) => {
               return bet.betColor === props.color;
             })
@@ -21,7 +15,7 @@ const BetDisplay = (props: Props) => {
                 <th>{bet.betAmount}</th>
                 <td>{bet.userId}</td>
               </tr>
-            ))}
+            ))} */}
         </tbody>
       </table>
     </div>

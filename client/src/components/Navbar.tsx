@@ -1,5 +1,4 @@
 import React from "react";
-import Auth from "./Auth";
 import Link from "next/link";
 
 const Navbar = () => {
@@ -58,9 +57,7 @@ const Navbar = () => {
           </li>
         </ul>
       </div>
-      <div className="navbar-end">
-        <Auth />
-      </div>
+      <div className="navbar-end">Auth</div>
     </div>
   );
 };

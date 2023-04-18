@@ -3,14 +3,17 @@ import { Server } from "socket.io";
 import { Timer } from "easytimer.js";
 import winston from "winston";
 import crypto from "crypto";
+import axios from "axios";
+
+const CLIENTURL = "http://localhost:3000";
 
 /**
  * TYPES
  */
 interface RouletteGameData {
-  id: string;
+  id?: string;
   status: string;
-  clock: string;
+  clock: number;
   color?: string;
   value?: number;
   bets: RouletteBetData[];
@@ -32,7 +35,7 @@ interface RouletteBetData {
 const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: CLIENTURL,
   },
 });
 const timer = new Timer();
@@ -54,14 +57,15 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 io.on("connection", (socket) => {
-  socket.on("placeBet", (data: RouletteBetData) => {
-    rouletteGameData.bets.push(data);
-    // try {
-    //   io.emit("receivedBet")
-    // } catch (e) {
-    //   logger.error(e)
-    // }
-  });
+  logger.info(`a user connected ${socket.id}`);
+  // socket.on("placeBet", (data: RouletteBetData) => {
+  //   rouletteGameData.bets.push(data);
+  //   try {
+  //     io.emit("receivedBet")
+  //   } catch (e) {
+  //     logger.error(e)
+  //   }
+  // });
 });
 
 httpServer.listen(3001, () => {
@@ -86,29 +90,55 @@ const getRollSpin = (seed: string) => {
 
 const getRollColor = (spin: number) => {
   if (spin % 2 === 0) {
-    return "red";
-  } else if (spin % 2 === 1) {
     return "black";
+  } else if (spin % 2 === 1) {
+    return "red";
   } else if (spin === 0) {
     return "green";
   }
+};
+
+const sendGameUpdate = (data: RouletteGameData) => {
+  io.emit("gameUpdate", data);
 };
 
 /**
  * GAME
  */
 timer.addEventListener("secondsUpdated", () => {
-  rouletteGameData.clock = timer.getTimeValues().toString();
+  rouletteGameData.clock = timer.getTimeValues().seconds;
 
-  if (rouletteGameData.clock === "00:01:00") {
+  if (timer.getTimeValues().toString() === "00:01:00") {
     rouletteGameData.status = "started";
+
+    axios
+      .get(`${CLIENTURL}/api/roulette/start`)
+      .then((data) => {
+        rouletteGameData = data.data;
+        logger.info(`${data.data.id} has started`);
+      })
+      .catch((e) => {
+        logger.error(e);
+      });
   }
 
-  if (rouletteGameData.clock === "00:00:55") {
+  if (timer.getTimeValues().toString() === "00:00:40") {
     rouletteGameData.status = "ended";
     rouletteGameData.value = getRollSpin(Date.now().toString());
     rouletteGameData.color = getRollColor(rouletteGameData.value);
+
+    axios
+      .post(`${CLIENTURL}/api/roulette/spin`, rouletteGameData)
+      .then((data) => {
+        console.log(data.data);
+        logger.info(`game ${data.data.id} has ended`);
+      })
+      .catch((e) => {
+        logger.error(e);
+      });
   }
+
+  sendGameUpdate(rouletteGameData);
 });
 
 timer.addEventListener("targetAchieved", () => {

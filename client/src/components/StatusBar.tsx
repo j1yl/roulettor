@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useGameState } from "~/context/GameStateContext";
+import React, { useContext, useEffect, useState } from "react";
+import { RouletteGameContext } from "../context/RouletteGameContext";
 
 interface StatusBarProps {
   totalTimeInSeconds: number;
@@ -8,14 +8,14 @@ interface StatusBarProps {
 const StatusBar: React.FC<StatusBarProps> = ({ totalTimeInSeconds }) => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [percentComplete, setPercentComplete] = useState(0);
-  const { gameState } = useGameState();
+  const rouletteGameContext = useContext(RouletteGameContext);
 
   useEffect(() => {
-    setElapsedTime(gameState.timeRemaining as number);
+    setElapsedTime(rouletteGameContext.rouletteGameData.clock);
     setPercentComplete(
-      ((gameState.timeRemaining as number) / totalTimeInSeconds) * 100
+      (rouletteGameContext.rouletteGameData.clock / totalTimeInSeconds) * 100
     );
-  }, [gameState]);
+  }, [rouletteGameContext, totalTimeInSeconds]);
 
   return (
     <div className="rounded-lg">
@@ -42,5 +42,4 @@ const StatusBar: React.FC<StatusBarProps> = ({ totalTimeInSeconds }) => {
     </div>
   );
 };
-
 export default StatusBar;

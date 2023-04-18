@@ -1,81 +1,46 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "~/server/db";
-import { Bet } from "@prisma/client";
 
-import { io } from "socket.io-client";
+interface BetRequest {
+  id: string;
+  status: string;
+  userId: string;
+  gameId: string;
+  betColor: string;
+  betAmount: number;
+}
 
-const socket = io("http://localhost:3001");
-
-export default async function createBet(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   if (req.method != "POST") {
     res.status(405).json({
-      status: "error",
       message: "Method not allowed",
     });
-    return;
   }
 
-  const { userId, gameId, betAmount, betColor, status, payout } =
-    req.body as Bet;
-
-  if (!userId || !gameId || !betAmount || !betColor) {
-    res.status(400).json({
-      status: "error",
-      message: "Missing required fields",
+  const { id, status, userId, gameId, betColor, betAmount } =
+    req.body as BetRequest;
+  if (!id || !status || !userId || !gameId || !betColor || !betAmount) {
+    return res.status(400).json({
+      message: "Missing parameters",
     });
-    return;
   }
 
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+  const bet = await prisma.bet.create({
+    data: {
+      id,
+      status,
+      userId,
+      gameId,
+      betColor,
+      betAmount,
+    },
+  });
 
-    if (!user) {
-      res.status(404).json({ status: "error", message: "Player not found" });
-      return;
-    }
-
-    if (user.balance < betAmount) {
-      res.status(400).json({ message: "Insufficient funds" });
-      return;
-    }
-
-    const bet = await prisma.bet.create({
-      data: {
-        userId,
-        gameId,
-        betAmount,
-        betColor,
-        status,
-        payout,
-      },
-    });
-
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        balance: {
-          decrement: betAmount,
-        },
-      },
-    });
-
-    res.status(200).json({
-      status: "ok",
-      bet,
-    });
-
-    socket.emit("betPlaced", bet);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ status: "error", message: "Internal server error" });
-  }
+  return res.status(200).json({
+    message: "Bet created",
+    bet,
+  });
 }
