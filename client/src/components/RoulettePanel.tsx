@@ -1,29 +1,47 @@
+import axios from "axios";
 import { useSession } from "next-auth/react";
 import React, { useContext, useEffect, useState } from "react";
 import { RouletteGameContext } from "~/context/RouletteGameContext";
 
-interface BetData {
+interface BetState {
+  status: string;
   betAmount: number;
-  betType: string;
+  betColor: string;
   userId: string;
   gameId: string;
 }
 
-const RoulettePanel = () => {
-  const [betData, setBetData] = useState<BetData>({
+interface RoulettePanelProps {
+  balance: number;
+  setBalance: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const RoulettePanel = (props: RoulettePanelProps) => {
+  const [betState, setBetState] = useState<BetState>({
+    status: "pending",
     betAmount: 0,
-    betType: "",
+    betColor: "",
     userId: "",
     gameId: "",
   });
-
   const rouletteGameContext = useContext(RouletteGameContext);
   const { data: session } = useSession();
 
+  const handleBet = () => {
+    axios
+      .post("/api/roulette/bet", betState)
+      .then((res) => {
+        props.setBalance(props.balance - res.data.bet.betAmount);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   useEffect(() => {
     if (rouletteGameContext && session?.user.id) {
-      setBetData({
-        ...betData,
+      setBetState({
+        ...betState,
         userId: session.user.id,
         gameId: rouletteGameContext.rouletteGameData.id,
       });
@@ -35,18 +53,18 @@ const RoulettePanel = () => {
       <section className="flex w-full justify-between">
         <div className="btn-group btn-group-vertical lg:btn-group-horizontal">
           <button className="btn-outline btn-sm btn pointer-events-none">
-            Pouch:
+            Pouch: {props.balance}
           </button>
         </div>
         <div className="btn-group btn-group-vertical lg:btn-group-horizontal">
           <button className="btn-outline btn-sm btn pointer-events-none">
-            Bet Amount: {betData.betAmount}
+            Bet Amount: {betState.betAmount}
           </button>
           <button
             className="btn-outline btn-sm btn"
             onClick={() =>
-              setBetData({
-                ...betData,
+              setBetState({
+                ...betState,
                 betAmount: 0,
               })
             }
@@ -56,9 +74,12 @@ const RoulettePanel = () => {
           <button
             className="btn-outline btn-sm btn"
             onClick={() =>
-              setBetData({
-                ...betData,
-                betAmount: betData.betAmount + 1,
+              setBetState({
+                ...betState,
+                betAmount:
+                  betState.betAmount + 1 <= 999
+                    ? betState.betAmount + 1
+                    : betState.betAmount,
               })
             }
           >
@@ -67,9 +88,12 @@ const RoulettePanel = () => {
           <button
             className="btn-outline btn-sm btn"
             onClick={() =>
-              setBetData({
-                ...betData,
-                betAmount: betData.betAmount + 10,
+              setBetState({
+                ...betState,
+                betAmount:
+                  betState.betAmount + 10 <= 999
+                    ? betState.betAmount + 10
+                    : betState.betAmount,
               })
             }
           >
@@ -78,9 +102,12 @@ const RoulettePanel = () => {
           <button
             className="btn-outline btn-sm btn"
             onClick={() =>
-              setBetData({
-                ...betData,
-                betAmount: betData.betAmount + 100,
+              setBetState({
+                ...betState,
+                betAmount:
+                  betState.betAmount + 100 <= 999
+                    ? betState.betAmount + 100
+                    : betState.betAmount,
               })
             }
           >
@@ -89,9 +116,12 @@ const RoulettePanel = () => {
           <button
             className="btn-outline btn-sm btn"
             onClick={() =>
-              setBetData({
-                ...betData,
-                betAmount: Math.floor(betData.betAmount / 2),
+              setBetState({
+                ...betState,
+                betAmount:
+                  Math.floor(betState.betAmount / 2) === 0
+                    ? 0
+                    : Math.floor(betState.betAmount / 2),
               })
             }
           >
@@ -100,9 +130,10 @@ const RoulettePanel = () => {
           <button
             className="btn-outline btn-sm btn"
             onClick={() =>
-              setBetData({
-                ...betData,
-                betAmount: betData.betAmount * 2,
+              setBetState({
+                ...betState,
+                betAmount:
+                  betState.betAmount * 2 >= 999 ? 999 : betState.betAmount * 2,
               })
             }
           >
@@ -116,7 +147,15 @@ const RoulettePanel = () => {
             <h2>Win 2x</h2>
           </div>
           <div className="flex w-full items-center justify-center gap-2 bg-base-300 p-2 font-bold">
-            <button className="btn-primary btn w-full">Place Bet</button>
+            <button
+              className="btn-primary btn w-full"
+              onClick={() => {
+                betState.betColor = "red";
+                handleBet();
+              }}
+            >
+              Place Bet
+            </button>
           </div>
         </div>
         <div className="w-full">
@@ -124,7 +163,15 @@ const RoulettePanel = () => {
             <h2>Win 14x</h2>
           </div>
           <div className="flex w-full items-center justify-center gap-2 bg-base-300 p-2 font-bold">
-            <button className="btn-green btn w-full">Place Bet</button>
+            <button
+              className="btn-green btn w-full"
+              onClick={() => {
+                betState.betColor = "green";
+                handleBet();
+              }}
+            >
+              Place Bet
+            </button>
           </div>
         </div>
         <div className="w-full">
@@ -132,7 +179,15 @@ const RoulettePanel = () => {
             <h2>Win 2x</h2>
           </div>
           <div className="flex w-full items-center justify-center gap-2 bg-base-300 p-2 font-bold">
-            <button className="btn-zinc btn w-full">Place Bet</button>
+            <button
+              className="btn-zinc btn w-full"
+              onClick={() => {
+                betState.betColor = "black";
+                handleBet();
+              }}
+            >
+              Place Bet
+            </button>
           </div>
         </div>
       </section>

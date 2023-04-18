@@ -4,18 +4,32 @@ import Head from "next/head";
 
 import Roulette from "~/components/Roulette";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const res = await axios.get("http://localhost:3000/api/roulette/game");
-  console.log(res.data);
-
-  return {
-    props: {},
+interface UserResponse {
+  data: {
+    user: {
+      balance: number;
+    };
   };
-};
+}
 
 const RoulettePage: NextPage = () => {
   const { data: session, status } = useSession();
+  const [balance, setBalance] = useState<number>(0);
+
+  useEffect(() => {
+    if (session?.user.id) {
+      axios
+        .get(`http://localhost:3000/api/user/${session.user.id}`)
+        .then((res: UserResponse) => {
+          setBalance(res.data.user.balance);
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+    }
+  }, [session]);
 
   if (status === "loading") {
     return <p>Loading...</p>;
@@ -46,7 +60,7 @@ const RoulettePage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col items-center">
-        <Roulette />
+        <Roulette balance={balance} setBalance={setBalance} />
         <button
           onClick={() => signOut()}
           className="btn-primary btn absolute bottom-20 right-0"

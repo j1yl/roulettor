@@ -22,6 +22,43 @@ export default async function handler(
 
   const { id, status, value, color } = req.body as SpinRequest;
 
+  const allBets = await prisma.bet.findMany({
+    where: {
+      gameId: id,
+    },
+  });
+
+  const getPayout = (color: string) => {
+    if (color === "red" || color === "black") {
+      return 2;
+    } else if (color === "green") {
+      return 14;
+    }
+    return -1;
+  };
+
+  const winningBets = allBets
+    .filter((bet) => {
+      return bet.betColor == color;
+    })
+    .map((item) => ({
+      ...item,
+      payout: item.betAmount * getPayout(item.betColor),
+    }));
+
+  winningBets.forEach(async (bet) => {
+    await prisma.user.updateMany({
+      where: {
+        id: bet.userId,
+      },
+      data: {
+        balance: {
+          increment: bet.payout,
+        },
+      },
+    });
+  });
+
   await prisma.game.updateMany({
     where: {
       id: id,
@@ -29,7 +66,7 @@ export default async function handler(
     data: {
       status: status,
       value: value,
-      clock: 888,
+      clock: 0,
       color: color,
     },
   });

@@ -58,14 +58,6 @@ if (process.env.NODE_ENV !== "production") {
 
 io.on("connection", (socket) => {
   logger.info(`a user connected ${socket.id}`);
-  // socket.on("placeBet", (data: RouletteBetData) => {
-  //   rouletteGameData.bets.push(data);
-  //   try {
-  //     io.emit("receivedBet")
-  //   } catch (e) {
-  //     logger.error(e)
-  //   }
-  // });
 });
 
 httpServer.listen(3001, () => {
@@ -99,7 +91,9 @@ const getRollColor = (spin: number) => {
 };
 
 const sendGameUpdate = (data: RouletteGameData) => {
-  io.emit("gameUpdate", data);
+  io.emit("gameUpdate", {
+    ...data,
+  });
 };
 
 /**
@@ -122,7 +116,7 @@ timer.addEventListener("secondsUpdated", () => {
       });
   }
 
-  if (timer.getTimeValues().toString() === "00:00:40") {
+  if (timer.getTimeValues().toString() === "00:00:00") {
     rouletteGameData.status = "ended";
     rouletteGameData.value = getRollSpin(Date.now().toString());
     rouletteGameData.color = getRollColor(rouletteGameData.value);
