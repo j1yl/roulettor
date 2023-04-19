@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import { useGameState } from "~/context/GameStateContext";
+import { useContext, useEffect, useRef } from "react";
+import { RouletteGameContext } from "../context/RouletteGameContext";
 
 // w-20 = 80px
 
@@ -8,59 +8,50 @@ const slot =
 
 const Spinner = () => {
   const myWheel = useRef<HTMLDivElement>(null);
-  const gameState = useGameState();
+  const rouletteGameContext = useContext(RouletteGameContext);
 
-  useEffect(() => {
-    if (
-      gameState.gameState.gameState === "ENDED" &&
-      gameState.gameState.winningValue
-    ) {
-      spinWheel(gameState.gameState.winningValue);
-    }
-  }, [gameState]);
-
-  let choiceArray = [0, 11, 5, 10, 6, 9, 7, 8, 1, 14, 2, 13, 3, 12, 4];
+  const choiceArray = [0, 11, 5, 10, 6, 9, 7, 8, 1, 14, 2, 13, 3, 12, 4];
 
   const spinWheel = (result: number) => {
-    let position = choiceArray.indexOf(result);
-    let rows = 12;
-    let card = 75 + 8 * 2; // cardwidth * gap (on both sides so * 2)
-    let landingPosition = rows * 15 * card + position * card + 340;
+    const position = choiceArray.indexOf(result);
+    const rows = 12;
+    const card = 75 + 8 * 2; // cardwidth * gap * both sides
+    const landingPosition = rows * 15 * card + position * card + 340;
 
-    // randomize the selection a little bit, function below
-    // let randomize = Math.floor(Math.random() * 75) - 75 / 2;
-    // landingPosition += randomize;
-
-    let object = {
+    const object = {
       x: Math.floor(Math.random() * 50) / 100,
       y: Math.floor(Math.random() * 20) / 100,
     };
-
-    let resetPosition = -(position * card + 700); // + randomize
+    const resetPosition = -(position * card + 700);
 
     if (myWheel.current) {
-      myWheel.current.style.transitionTimingFunction =
-        "cubic-bezier(0," + object.x + "," + object.y + ",1)";
-      myWheel.current.style.transitionDuration = "6s";
-      myWheel.current.style.transform =
-        "translate3d(-" + landingPosition + "px, 0px, 0px)";
+      myWheel.current.style.transitionTimingFunction = `cubic-bezier(0, ${object.x}, ${object.y}, 1)`;
+      myWheel.current.style.transitionDuration = "3s";
+      myWheel.current.style.transform = `translate3d(-${landingPosition}px, 0px, 0px)`;
     }
 
     setTimeout(() => {
       if (myWheel.current) {
         myWheel.current.style.transitionTimingFunction = "";
-        myWheel.current.style.transitionDuration = "";
-        myWheel.current.style.transform =
-          "translate3d(" + resetPosition + "px, 0px, 0px)";
+        myWheel.current.style.transitionDuration = "0s";
+        myWheel.current.style.transform = `translate3d(${resetPosition}px, 0px, 0px)`;
       }
-    }, 6 * 1000);
+    }, 3 * 1000);
   };
+
+  useEffect(() => {
+    if (myWheel.current) {
+      if (rouletteGameContext?.rouletteGameData.status === "ended") {
+        spinWheel(rouletteGameContext?.rouletteGameData.value as number);
+      }
+    }
+  });
 
   return (
     <>
       <div className="relative mx-auto flex w-full justify-center overflow-hidden rounded-lg p-4">
         <div ref={myWheel} className="flex gap-2">
-          {Array.from({ length: 29 }, (_, i) => i).map((_, i) =>
+          {Array.from({ length: 29 }).map(() =>
             choiceArray.map((item, index) => {
               if (item === 0)
                 return (

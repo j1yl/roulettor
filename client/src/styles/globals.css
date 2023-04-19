@@ -5,3 +5,11 @@
 .btn {
   @apply normal-case font-bold
 }
+
+.btn-green {
+  @apply btn w-full bg-green-600 hover:bg-green-700 border-none
+}
+
+.btn-zinc {
+  @apply btn w-full bg-zinc-900 hover:bg-zinc-800 border-none
+}

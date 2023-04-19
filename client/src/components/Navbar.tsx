@@ -1,8 +1,11 @@
 import React from "react";
-import Auth from "./Auth";
 import Link from "next/link";
+import Pouch from "./Pouch";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
+  const { data: session } = useSession();
+
   return (
     <div className="navbar">
       <div className="navbar-start">
@@ -58,8 +61,17 @@ const Navbar = () => {
           </li>
         </ul>
       </div>
-      <div className="navbar-end">
-        <Auth />
+      <div className="navbar-end flex gap-0 md:gap-4">
+        <Pouch />
+        {session?.user ? (
+          <button onClick={() => void signOut()} className="btn-primary btn">
+            Logout
+          </button>
+        ) : (
+          <button onClick={() => void signIn()} className="btn-primary btn">
+            Login
+          </button>
+        )}
       </div>
     </div>
   );

@@ -1,61 +1,59 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "~/server/db";
-import { Bet } from "@prisma/client";
-
+import type { NextApiRequest, NextApiResponse } from "next";
 import { io } from "socket.io-client";
+import { prisma } from "~/server/db";
 
 const socket = io("http://localhost:3001");
 
-export default async function createBet(
+interface BetRequest {
+  id: string;
+  status: string;
+  userId: string;
+  gameId: string;
+  betColor: string;
+  betAmount: number;
+}
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method != "POST") {
-    res.status(405).json({
-      status: "error",
-      message: "Method not allowed",
-    });
-    return;
-  }
+  if (req.method !== "POST") return res.status(405).end();
 
-  const { userId, gameId, betAmount, betColor, status, payout } =
-    req.body as Bet;
+  const { status, userId, gameId, betColor, betAmount } =
+    req.body as BetRequest;
 
-  if (!userId || !gameId || !betAmount || !betColor) {
-    res.status(400).json({
-      status: "error",
-      message: "Missing required fields",
+  if (!status || !userId || !gameId || !betColor || !betAmount) {
+    return res.status(400).json({
+      message: "missing required data",
     });
-    return;
   }
 
   try {
-    const user = await prisma.user.findUnique({
+    const existingBet = await prisma.bet.findMany({
       where: {
-        id: userId,
+        userId: userId,
+        gameId: gameId,
       },
     });
 
-    if (!user) {
-      res.status(404).json({ status: "error", message: "Player not found" });
-      return;
-    }
-
-    if (user.balance < betAmount) {
-      res.status(400).json({ message: "Insufficient funds" });
-      return;
+    if (existingBet.length > 0) {
+      return res.status(400).json({
+        message: "user already has a bet",
+        existingBet,
+      });
     }
 
     const bet = await prisma.bet.create({
       data: {
+        status,
         userId,
         gameId,
-        betAmount,
         betColor,
-        status,
-        payout,
+        betAmount,
       },
     });
+
+    socket.emit("betPlaced", bet);
 
     await prisma.user.update({
       where: {
@@ -68,14 +66,10 @@ export default async function createBet(
       },
     });
 
-    res.status(200).json({
-      status: "ok",
+    return res.status(200).json({
       bet,
     });
-
-    socket.emit("betPlaced", bet);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ status: "error", message: "Internal server error" });
+  } catch (error) {
+    return res.status(500).end();
   }
 }

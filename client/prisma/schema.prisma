@@ -47,19 +47,19 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  balance       Float     @default(10000)
+  balance       Float     @default(500)
   accounts      Account[]
   bets          Bet[]
   sessions      Session[]
 }
 
-model GameInfo {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  gameState    String
-  winningColor String
-  winningValue Int
-  bets         Bet[]
+model Game {
+  id     String  @id @default(cuid())
+  status String
+  clock  Int
+  color  String?
+  value  Int?
+  bets   Bet[]
 }
 
 model Bet {
@@ -70,7 +70,6 @@ model Bet {
   betColor  String
   betAmount Float
   createdAt DateTime @default(now())
-  payout    Int      @default(0)
-  game      GameInfo @relation(fields: [gameId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+  game      Game     @relation(fields: [gameId], references: [id])
 }
