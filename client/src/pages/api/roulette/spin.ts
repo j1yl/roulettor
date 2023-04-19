@@ -10,74 +10,84 @@ interface SpinRequest {
   color: string;
 }
 
+const getPayout = (betAmount: number, betColor: string) => {
+  if (betColor === "green") {
+    return betAmount * 14;
+  } else if (betColor === "red" || betColor === "black") {
+    return betAmount * 2;
+  }
+  return 0;
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method != "POST") {
-    res.status(405).json({
-      message: "Method not allowed",
-    });
-  }
+  if (req.method !== "POST") return res.status(405).end();
 
   const { id, status, value, color } = req.body as SpinRequest;
 
-  const allBets = await prisma.bet.findMany({
-    where: {
-      gameId: id,
-    },
-  });
-
-  const getPayout = (color: string) => {
-    if (color === "red" || color === "black") {
-      return 2;
-    } else if (color === "green") {
-      return 14;
-    }
-    return -1;
-  };
-
-  const winningBets = allBets
-    .filter((bet) => {
-      return bet.betColor == color;
-    })
-    .map((item) => ({
-      ...item,
-      payout: item.betAmount * getPayout(item.betColor),
-    }));
-
-  winningBets.forEach(async (bet) => {
-    await prisma.user.updateMany({
-      where: {
-        id: bet.userId,
-      },
-      data: {
-        balance: {
-          increment: bet.payout,
-        },
-      },
-    });
-  });
-
-  await prisma.game.updateMany({
-    where: {
-      id: id,
-    },
-    data: {
-      status: status,
-      value: value,
-      clock: 0,
-      color: color,
-    },
-  });
-
   if (!id || !status || !value || !color) {
     return res.status(400).json({
-      message: "Missing data",
+      message: "missing required data",
     });
   }
 
-  return res.status(200).json({
-    id: id,
-  });
+  try {
+    const game = await prisma.game.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status,
+        color,
+        value,
+        clock: 0,
+      },
+    });
+
+    const bets = await prisma.bet.findMany({
+      where: {
+        gameId: id,
+      },
+    });
+
+    for (const bet of bets) {
+      if (bet.betColor === color) {
+        await prisma.user.update({
+          where: {
+            id: bet.userId,
+          },
+          data: {
+            balance: {
+              increment: getPayout(bet.betAmount, bet.betColor),
+            },
+          },
+        });
+        await prisma.bet.update({
+          where: {
+            id: bet.id,
+          },
+          data: {
+            status: "won",
+          },
+        });
+      } else {
+        await prisma.bet.update({
+          where: {
+            id: bet.id,
+          },
+          data: {
+            status: "loss",
+          },
+        });
+      }
+    }
+
+    return res.status(200).send({
+      id: game.id,
+    });
+  } catch (error) {
+    return res.status(500).end();
+  }
 }

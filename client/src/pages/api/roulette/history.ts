@@ -5,20 +5,26 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const game = await prisma.game.findMany({
-    where: {
-      status: "ended",
-    },
-  });
-  const lastFiftyGames = game.slice(0, 50);
+  if (req.method !== "GET") return res.status(405).end();
 
-  if (game.length > 50) {
-    return res.status(200).json({
-      lastFiftyGames,
+  try {
+    const game = await prisma.game.findMany({
+      where: {
+        status: "ended",
+      },
     });
-  }
+    const lastFiftyGames = game.slice(0, 50);
 
-  return res.status(200).json({
-    game,
-  });
+    if (game.length > 50) {
+      return res.status(200).json({
+        lastFiftyGames,
+      });
+    }
+
+    return res.status(200).json({
+      game,
+    });
+  } catch (error) {
+    return res.status(500).end();
+  }
 }

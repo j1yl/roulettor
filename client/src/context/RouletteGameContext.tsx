@@ -18,7 +18,7 @@ type RouletteGameContextProviderProps = {
 const defaultRouletteGameData: RouletteGameData = {
   id: "",
   status: "",
-  clock: 100,
+  clock: 0,
   bets: [],
 };
 

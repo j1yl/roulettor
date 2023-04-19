@@ -2,6 +2,10 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import React, { useContext, useEffect, useState } from "react";
 import { RouletteGameContext } from "~/context/RouletteGameContext";
+import RouletteBetDisplay from "./RouletteBetDisplay";
+import RouletteHistory from "./RouletteHistory";
+
+const MAXBET = 10000;
 
 interface BetState {
   status: string;
@@ -11,12 +15,7 @@ interface BetState {
   gameId: string;
 }
 
-interface RoulettePanelProps {
-  balance: number;
-  setBalance: React.Dispatch<React.SetStateAction<number>>;
-}
-
-const RoulettePanel = (props: RoulettePanelProps) => {
+const RoulettePanel = () => {
   const [betState, setBetState] = useState<BetState>({
     status: "pending",
     betAmount: 0,
@@ -28,14 +27,7 @@ const RoulettePanel = (props: RoulettePanelProps) => {
   const { data: session } = useSession();
 
   const handleBet = () => {
-    axios
-      .post("/api/roulette/bet", betState)
-      .then((res) => {
-        props.setBalance(props.balance - res.data.bet.betAmount);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    void axios.post("/api/roulette/bet", betState).catch();
   };
 
   useEffect(() => {
@@ -46,16 +38,12 @@ const RoulettePanel = (props: RoulettePanelProps) => {
         gameId: rouletteGameContext.rouletteGameData.id,
       });
     }
-  }, [rouletteGameContext]);
+  }, [rouletteGameContext, betState, session]);
 
   return (
     <>
       <section className="flex w-full justify-between">
-        <div className="btn-group btn-group-vertical lg:btn-group-horizontal">
-          <button className="btn-outline btn-sm btn pointer-events-none">
-            Pouch: {props.balance}
-          </button>
-        </div>
+        <RouletteHistory />
         <div className="btn-group btn-group-vertical lg:btn-group-horizontal">
           <button className="btn-outline btn-sm btn pointer-events-none">
             Bet Amount: {betState.betAmount}
@@ -77,7 +65,7 @@ const RoulettePanel = (props: RoulettePanelProps) => {
               setBetState({
                 ...betState,
                 betAmount:
-                  betState.betAmount + 1 <= 999
+                  betState.betAmount + 1 <= MAXBET
                     ? betState.betAmount + 1
                     : betState.betAmount,
               })
@@ -91,7 +79,7 @@ const RoulettePanel = (props: RoulettePanelProps) => {
               setBetState({
                 ...betState,
                 betAmount:
-                  betState.betAmount + 10 <= 999
+                  betState.betAmount + 10 <= MAXBET
                     ? betState.betAmount + 10
                     : betState.betAmount,
               })
@@ -105,7 +93,7 @@ const RoulettePanel = (props: RoulettePanelProps) => {
               setBetState({
                 ...betState,
                 betAmount:
-                  betState.betAmount + 100 <= 999
+                  betState.betAmount + 100 <= MAXBET
                     ? betState.betAmount + 100
                     : betState.betAmount,
               })
@@ -133,7 +121,9 @@ const RoulettePanel = (props: RoulettePanelProps) => {
               setBetState({
                 ...betState,
                 betAmount:
-                  betState.betAmount * 2 >= 999 ? 999 : betState.betAmount * 2,
+                  betState.betAmount * 2 >= MAXBET
+                    ? MAXBET
+                    : betState.betAmount * 2,
               })
             }
           >
@@ -146,7 +136,7 @@ const RoulettePanel = (props: RoulettePanelProps) => {
           <div className="flex w-full items-center justify-center rounded-t-lg bg-base-300 p-2 font-bold">
             <h2>Win 2x</h2>
           </div>
-          <div className="flex w-full items-center justify-center gap-2 bg-base-300 p-2 font-bold">
+          <div className="flex w-full flex-col items-center justify-center gap-2 bg-base-300 p-2 font-bold">
             <button
               className="btn-primary btn w-full"
               onClick={() => {
@@ -156,13 +146,14 @@ const RoulettePanel = (props: RoulettePanelProps) => {
             >
               Place Bet
             </button>
+            <RouletteBetDisplay color="red" />
           </div>
         </div>
         <div className="w-full">
           <div className="flex w-full items-center justify-center rounded-t-lg bg-base-300 p-2 font-bold">
             <h2>Win 14x</h2>
           </div>
-          <div className="flex w-full items-center justify-center gap-2 bg-base-300 p-2 font-bold">
+          <div className="flex w-full flex-col items-center justify-center gap-2 bg-base-300 p-2 font-bold">
             <button
               className="btn-green btn w-full"
               onClick={() => {
@@ -172,13 +163,14 @@ const RoulettePanel = (props: RoulettePanelProps) => {
             >
               Place Bet
             </button>
+            <RouletteBetDisplay color="green" />
           </div>
         </div>
         <div className="w-full">
           <div className="flex w-full items-center justify-center rounded-t-lg bg-base-300 p-2 font-bold">
             <h2>Win 2x</h2>
           </div>
-          <div className="flex w-full items-center justify-center gap-2 bg-base-300 p-2 font-bold">
+          <div className="flex w-full flex-col items-center justify-center gap-2 bg-base-300 p-2 font-bold">
             <button
               className="btn-zinc btn w-full"
               onClick={() => {
@@ -188,6 +180,7 @@ const RoulettePanel = (props: RoulettePanelProps) => {
             >
               Place Bet
             </button>
+            <RouletteBetDisplay color="black" />
           </div>
         </div>
       </section>

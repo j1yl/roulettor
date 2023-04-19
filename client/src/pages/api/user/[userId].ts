@@ -5,39 +5,35 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method != "GET") {
+  if (req.method !== "GET") {
     res.status(405).json({
       status: "error",
       message: "Method not allowed",
     });
     return;
   }
-  const { userId } = req.query;
-  if (!userId) {
-    res.status(400).json({
-      status: "error",
-      message: "Missing required fields",
-    });
-    return;
-  }
 
-  let user;
+  const { userId } = req.query;
+
+  if (!userId)
+    return res.status(400).json({
+      message: "missing required data",
+    });
 
   try {
-    user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         id: userId as string,
       },
     });
-    if (!user) {
-      res.status(404).json({ status: "error", message: "User not found" });
-      return;
-    }
+
+    if (!user)
+      return res.status(404).json({ message: "no user found", id: userId });
+
     res.status(200).json({
       user,
     });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ status: "error", message: "Internal server error" });
+  } catch (error) {
+    res.status(500).end();
   }
 }

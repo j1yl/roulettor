@@ -26,22 +26,24 @@ const Spinner = () => {
 
     if (myWheel.current) {
       myWheel.current.style.transitionTimingFunction = `cubic-bezier(0, ${object.x}, ${object.y}, 1)`;
-      myWheel.current.style.transitionDuration = "6s";
+      myWheel.current.style.transitionDuration = "3s";
       myWheel.current.style.transform = `translate3d(-${landingPosition}px, 0px, 0px)`;
     }
 
     setTimeout(() => {
       if (myWheel.current) {
         myWheel.current.style.transitionTimingFunction = "";
-        myWheel.current.style.transitionDuration = "";
+        myWheel.current.style.transitionDuration = "0s";
         myWheel.current.style.transform = `translate3d(${resetPosition}px, 0px, 0px)`;
       }
-    }, 6 * 1000);
+    }, 3 * 1000);
   };
 
   useEffect(() => {
-    if (rouletteGameContext?.rouletteGameData.status === "ended") {
-      spinWheel(rouletteGameContext?.rouletteGameData.value as number);
+    if (myWheel.current) {
+      if (rouletteGameContext?.rouletteGameData.status === "ended") {
+        spinWheel(rouletteGameContext?.rouletteGameData.value as number);
+      }
     }
   });
 

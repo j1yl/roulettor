@@ -58,6 +58,11 @@ if (process.env.NODE_ENV !== "production") {
 
 io.on("connection", (socket) => {
   logger.info(`a user connected ${socket.id}`);
+  socket.on("betPlaced", (bet: RouletteBetData) => {
+    logger.info(`bet placed ${bet.id}`);
+    rouletteGameData.bets.push(bet);
+    io.emit("betReceived", bet);
+  });
 });
 
 httpServer.listen(3001, () => {
@@ -124,8 +129,8 @@ timer.addEventListener("secondsUpdated", () => {
     axios
       .post(`${CLIENTURL}/api/roulette/spin`, rouletteGameData)
       .then((data) => {
-        console.log(data.data);
-        logger.info(`game ${data.data.id} has ended`);
+        logger.info(`${data.data.id} has ended`);
+        rouletteGameData.bets = [];
       })
       .catch((e) => {
         logger.error(e);

@@ -5,21 +5,26 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const game = await prisma.game.findFirst({
-    where: {
-      status: "started",
-    },
-  });
+  if (req.method !== "GET") return res.status(405).end();
 
-  if (game) {
-    console.log(game);
-    return res.status(200).json({
-      game,
+  try {
+    const game = await prisma.game.findFirst({
+      where: {
+        status: "started",
+      },
     });
-  }
 
-  return res.status(200).json({
-    message: "No active games",
-    time: Date.now(),
-  });
+    if (game) {
+      return res.status(200).json({
+        game,
+      });
+    }
+
+    return res.status(200).json({
+      message: "No active games",
+      time: Date.now(),
+    });
+  } catch (error) {
+    return res.status(500).end();
+  }
 }

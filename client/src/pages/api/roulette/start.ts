@@ -6,17 +6,23 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RouletteGameData>
 ) {
-  const game = await prisma.game.create({
-    data: {
+  if (req.method !== "GET") return res.status(405).end();
+
+  try {
+    const game = await prisma.game.create({
+      data: {
+        status: "started",
+        clock: 60,
+      },
+    });
+
+    return res.status(200).json({
+      id: game.id,
       status: "started",
       clock: 60,
-    },
-  });
-
-  return res.status(200).json({
-    id: game.id,
-    status: "started",
-    clock: 60,
-    bets: [],
-  });
+      bets: [],
+    });
+  } catch (error) {
+    return res.status(500).end();
+  }
 }

@@ -47,7 +47,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  balance       Float     @default(10000)
+  balance       Float     @default(500)
   accounts      Account[]
   bets          Bet[]
   sessions      Session[]
