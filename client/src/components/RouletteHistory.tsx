@@ -16,7 +16,6 @@ interface HistoryResponse {
 }
 
 const RouletteHistory = () => {
-  const [history, setHistory] = useState<Game[]>([]);
   const [redCount, setRedCount] = useState<number>(0);
   const [blackCount, setBlackCount] = useState<number>(0);
   const [greenCount, setGreenCount] = useState<number>(0);
@@ -25,22 +24,23 @@ const RouletteHistory = () => {
     void axios
       .get(`/api/roulette/history`)
       .then((res: HistoryResponse) => {
-        setHistory(res.data.game);
-        setRedCount(
-          history.filter((game) => {
-            return game.color === "red";
-          }).length
-        );
-        setBlackCount(
-          history.filter((game) => {
-            return game.color === "black";
-          }).length
-        );
-        setGreenCount(
-          history.filter((game) => {
-            return game.color === "green";
-          }).length
-        );
+        if (res.data.game) {
+          setRedCount(
+            res.data.game.filter((game) => {
+              return game.color === "red";
+            }).length
+          );
+          setBlackCount(
+            res.data.game.filter((game) => {
+              return game.color === "black";
+            }).length
+          );
+          setGreenCount(
+            res.data.game.filter((game) => {
+              return game.color === "green";
+            }).length
+          );
+        }
       })
       .catch();
   });
