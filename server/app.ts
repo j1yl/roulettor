@@ -6,7 +6,7 @@ import crypto from "crypto";
 import axios from "axios";
 import express from "express";
 
-const CLIENTURL = "https://roulettor.com";
+const CLIENTURL = "https://www.roulettor.com";
 
 /**
  * TYPES
