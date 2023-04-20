@@ -4,6 +4,8 @@ import { Timer } from "easytimer.js";
 import winston from "winston";
 import crypto from "crypto";
 import axios from "axios";
+import express from "express";
+import cors from "cors";
 
 const CLIENTURL = "https://roulettor.com";
 
@@ -32,13 +34,12 @@ interface RouletteBetData {
 /**
  * INITIALIZATION
  */
+const app = express();
 const httpServer = createServer();
-const io = new Server(httpServer, {
-  cors: {
-    origin: CLIENTURL,
-  },
-});
+const io = new Server(httpServer);
 const timer = new Timer();
+
+app.use(cors);
 
 const logger = winston.createLogger({
   level: "info",
@@ -48,13 +49,13 @@ const logger = winston.createLogger({
   ],
 });
 
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new winston.transports.Console({
-      format: winston.format.simple(),
-    })
-  );
-}
+// if (process.env.NODE_ENV !== "production") {
+logger.add(
+  new winston.transports.Console({
+    format: winston.format.simple(),
+  })
+);
+// }
 
 io.on("connection", (socket) => {
   logger.info(`a user connected ${socket.id}`);
@@ -65,7 +66,8 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(3000, () => {
+httpServer.listen(process.env.PORT || 5000, () => {
+  console.log(`started on port ${process.env.PORT}`);
   timer.start({
     precision: "seconds",
     countdown: true,
