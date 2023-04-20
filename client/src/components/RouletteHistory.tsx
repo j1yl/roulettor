@@ -1,5 +1,6 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { RouletteGameContext } from "~/context/RouletteGameContext";
 
 interface Game {
   id: string;
@@ -19,6 +20,8 @@ const RouletteHistory = () => {
   const [redCount, setRedCount] = useState<number>(0);
   const [blackCount, setBlackCount] = useState<number>(0);
   const [greenCount, setGreenCount] = useState<number>(0);
+
+  const rouletteGameContext = useContext(RouletteGameContext);
 
   useEffect(() => {
     void axios
@@ -43,7 +46,7 @@ const RouletteHistory = () => {
         }
       })
       .catch();
-  });
+  }, [rouletteGameContext.rouletteGameData.status]);
 
   return (
     <>
