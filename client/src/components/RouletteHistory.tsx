@@ -26,23 +26,21 @@ const RouletteHistory = () => {
       .get(`/api/roulette/history`)
       .then((res: HistoryResponse) => {
         setHistory(res.data.game);
-        if (history.length > 0) {
-          setRedCount(
-            history.filter((game) => {
-              return game.color === "red";
-            }).length
-          );
-          setBlackCount(
-            history.filter((game) => {
-              return game.color === "black";
-            }).length
-          );
-          setGreenCount(
-            history.filter((game) => {
-              return game.color === "green";
-            }).length
-          );
-        }
+        setRedCount(
+          history.filter((game) => {
+            return game.color === "red";
+          }).length
+        );
+        setBlackCount(
+          history.filter((game) => {
+            return game.color === "black";
+          }).length
+        );
+        setGreenCount(
+          history.filter((game) => {
+            return game.color === "green";
+          }).length
+        );
       })
       .catch();
   });
