@@ -63,7 +63,6 @@ io.on("connection", (socket) => {
   socket.on("betPlaced", (bet: RouletteBetData) => {
     logger.info(`bet placed ${bet.id}`);
     rouletteGameData.bets.push(bet);
-    io.emit("betReceived", bet);
   });
 });
 

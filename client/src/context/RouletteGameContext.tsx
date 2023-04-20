@@ -38,9 +38,6 @@ export const RouletteGameContextProvider = ({
     socket.on("gameUpdate", (data: RouletteGameData) => {
       setRouletteGameData({ ...data });
     });
-    socket.on("betReceived", (bet: RouletteBetData) => {
-      rouletteGameData.bets.push(bet);
-    });
     return () => {
       socket.disconnect();
     };

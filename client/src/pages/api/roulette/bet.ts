@@ -2,7 +2,9 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { io } from "socket.io-client";
 import { prisma } from "~/server/db";
 
-const socket = io("http://stat.roulettor.com");
+const socket = io("http://stat.roulettor.com", {
+  autoConnect: false,
+});
 
 interface BetRequest {
   id: string;
@@ -17,6 +19,8 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  socket.connect();
+
   if (req.method !== "POST") return res.status(405).end();
 
   const { status, userId, gameId, betColor, betAmount } =
