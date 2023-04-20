@@ -5,7 +5,6 @@ import winston from "winston";
 import crypto from "crypto";
 import axios from "axios";
 import express from "express";
-import cors from "cors";
 
 const CLIENTURL = "https://roulettor.com";
 
@@ -36,15 +35,12 @@ interface RouletteBetData {
  */
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
-const timer = new Timer();
-
-app.use(
-  cors({
+const io = new Server(httpServer, {
+  cors: {
     origin: CLIENTURL,
-    methods: ["GET", "POST"],
-  })
-);
+  },
+});
+const timer = new Timer();
 
 const logger = winston.createLogger({
   level: "info",

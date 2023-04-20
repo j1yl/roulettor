@@ -3,10 +3,6 @@ import type { RouletteGameData } from "../types/game";
 import { io } from "socket.io-client";
 
 const socket = io("https://stat.roulettor.com", {
-  withCredentials: true,
-  extraHeaders: {
-    "my-custom-header": "abcd",
-  },
   autoConnect: false,
 });
 
