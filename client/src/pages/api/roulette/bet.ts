@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { io } from "socket.io-client";
 import { prisma } from "~/server/db";
 
-const socket = io("http://stat.roulettor.com", {
+const socket = io("https://stat.roulettor.com", {
   autoConnect: false,
 });
 
@@ -69,6 +69,8 @@ export default async function handler(
         },
       },
     });
+
+    socket.disconnect();
 
     return res.status(200).json({
       bet,
