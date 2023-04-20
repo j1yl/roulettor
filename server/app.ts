@@ -35,6 +35,12 @@ interface RouletteBetData {
  * INITIALIZATION
  */
 const app = express();
+app.use(
+  cors({
+    origin: CLIENTURL,
+    credentials: true,
+  })
+);
 const httpServer = createServer();
 const io = new Server(httpServer);
 const timer = new Timer();
