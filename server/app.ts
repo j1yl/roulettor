@@ -35,18 +35,11 @@ interface RouletteBetData {
  * INITIALIZATION
  */
 const app = express();
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Origin"],
-  })
-);
-const httpServer = createServer();
+const httpServer = createServer(app);
 const io = new Server(httpServer);
 const timer = new Timer();
 
-app.use(cors);
+app.use(cors());
 
 const logger = winston.createLogger({
   level: "info",
