@@ -5,7 +5,7 @@ import winston from "winston";
 import crypto from "crypto";
 import axios from "axios";
 
-const CLIENTURL = "http://localhost:3000";
+const CLIENTURL = "https://roulettor.com";
 
 /**
  * TYPES

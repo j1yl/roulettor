@@ -29,6 +29,9 @@ declare module "next-auth" {
   //   // ...other properties
   //   // role: UserRole;
   // }
+  interface User {
+    balance: number;
+  }
 }
 
 /**
@@ -45,6 +48,13 @@ export const authOptions: NextAuthOptions = {
         id: user.id,
       },
     }),
+  },
+  pages: {
+    signIn: "/auth/signin",
+    signOut: "/auth/signout",
+    error: "/auth/error", // Error code passed in query string as ?error=
+    verifyRequest: "/auth/verify-request", // (used for check email message)
+    newUser: "/auth/new-user",
   },
   adapter: PrismaAdapter(prisma),
   providers: [
