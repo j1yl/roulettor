@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(3001, () => {
+httpServer.listen(3000, () => {
   timer.start({
     precision: "seconds",
     countdown: true,
