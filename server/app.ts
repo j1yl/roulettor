@@ -7,7 +7,7 @@ import axios from "axios";
 import express from "express";
 import cors from "cors";
 
-const CLIENTURL = "https://roulettor.com";
+const CLIENTURL = "http://roulettor.com";
 
 /**
  * TYPES
