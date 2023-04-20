@@ -28,7 +28,6 @@ export const getServerSideProps = async (
 const SignIn = ({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  console.log(providers);
   return (
     <>
       <Head>
