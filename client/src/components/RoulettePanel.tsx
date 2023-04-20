@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { RouletteGameContext } from "~/context/RouletteGameContext";
 import RouletteBetDisplay from "./RouletteBetDisplay";
 import RouletteHistory from "./RouletteHistory";
@@ -27,10 +27,6 @@ const RoulettePanel = () => {
   const { data: session } = useSession();
 
   const handleBet = () => {
-    void axios.post("/api/roulette/bet", betState).catch();
-  };
-
-  useEffect(() => {
     if (rouletteGameContext && session?.user.id) {
       setBetState({
         ...betState,
@@ -38,7 +34,8 @@ const RoulettePanel = () => {
         gameId: rouletteGameContext.rouletteGameData.id,
       });
     }
-  }, [rouletteGameContext, betState, session]);
+    void axios.post("/api/roulette/bet", betState).catch();
+  };
 
   return (
     <>

@@ -46,7 +46,7 @@ const RouletteHistory = () => {
         }
       })
       .catch();
-  }, [rouletteGameContext.rouletteGameData.status]);
+  }, [rouletteGameContext]);
 
   return (
     <>

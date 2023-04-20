@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import type { RouletteGameData } from "../types/game";
+import type { RouletteBetData, RouletteGameData } from "../types/game";
 import { io } from "socket.io-client";
 
 const socket = io("https://stat.roulettor.com", {
@@ -38,10 +38,13 @@ export const RouletteGameContextProvider = ({
     socket.on("gameUpdate", (data: RouletteGameData) => {
       setRouletteGameData({ ...data });
     });
+    socket.on("betReceived", (bet: RouletteBetData) => {
+      rouletteGameData.bets.push(bet);
+    });
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [rouletteGameData]);
 
   return (
     <RouletteGameContext.Provider
