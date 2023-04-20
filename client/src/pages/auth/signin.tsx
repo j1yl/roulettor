@@ -48,7 +48,7 @@ const SignIn = ({
         {Object.values(providers).map((provider) => (
           <div key={provider.name}>
             <button
-              onClick={() => signIn(provider.id)}
+              onClick={() => void signIn(provider.id)}
               className="btn-base btn"
             >
               Sign in with {provider.name}
