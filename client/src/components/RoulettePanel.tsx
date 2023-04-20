@@ -27,12 +27,9 @@ const RoulettePanel = () => {
   const { data: session } = useSession();
 
   const handleBet = () => {
-    if (rouletteGameContext && session?.user.id) {
-      setBetState({
-        ...betState,
-        userId: session.user.id,
-        gameId: rouletteGameContext.rouletteGameData.id,
-      });
+    if (session?.user.id) {
+      betState.userId = session.user.id;
+      betState.gameId = rouletteGameContext.rouletteGameData.id;
     }
     void axios.post("/api/roulette/bet", betState).catch();
   };
