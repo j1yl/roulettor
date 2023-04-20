@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { io } from "socket.io-client";
 import { prisma } from "~/server/db";
 
-const socket = io("http://localhost:3001");
+const socket = io("http://stat.roulettor.com");
 
 interface BetRequest {
   id: string;

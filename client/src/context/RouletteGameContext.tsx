@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useState } from "react";
 import type { RouletteGameData } from "../types/game";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3001", {
+const socket = io("http://stat.roulettor.com", {
   autoConnect: false,
 });
 
