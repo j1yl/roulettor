@@ -68,9 +68,9 @@ const Navbar = () => {
             Logout
           </button>
         ) : (
-          <button onClick={() => void signIn()} className="btn-primary btn">
+          <Link href={"/auth/signin"} className="btn-primary btn">
             Login
-          </button>
+          </Link>
         )}
       </div>
     </div>

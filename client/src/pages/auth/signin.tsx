@@ -6,7 +6,6 @@ import Head from "next/head";
 import { authOptions } from "~/server/auth";
 import { getProviders, signIn } from "next-auth/react";
 import { getServerSession } from "next-auth";
-// import { prisma } from "~/server/db";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -14,13 +13,6 @@ export const getServerSideProps = async (
   const session = await getServerSession(context.req, context.res, authOptions);
 
   if (session) {
-    // const existingUser = await prisma.user.findFirst({
-    //   where: {
-    //     id: session?.user.id,
-    //   },
-    // });
-
-    // if (existingUser)
     return { redirect: { destination: "/" } };
   }
 
@@ -36,6 +28,7 @@ export const getServerSideProps = async (
 const SignIn = ({
   providers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  console.log(providers);
   return (
     <>
       <Head>
