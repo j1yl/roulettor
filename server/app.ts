@@ -39,7 +39,12 @@ const httpServer = createServer(app);
 const io = new Server(httpServer);
 const timer = new Timer();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: CLIENTURL,
+    methods: ["GET", "POST"],
+  })
+);
 
 const logger = winston.createLogger({
   level: "info",
