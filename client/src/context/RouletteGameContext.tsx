@@ -3,7 +3,7 @@ import type { RouletteGameData } from "../types/game";
 import { io } from "socket.io-client";
 import { env } from "~/env.mjs";
 
-const socket = io(env.SOCKET_URL, {
+const socket = io(env.NEXT_PUBLIC_SOCKET_URL, {
   autoConnect: false,
 });
 

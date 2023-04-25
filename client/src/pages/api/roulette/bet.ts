@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 
-const socket = io(env.SOCKET_URL, {
+const socket = io(env.NEXT_PUBLIC_SOCKET_URL, {
   autoConnect: false,
 });
 

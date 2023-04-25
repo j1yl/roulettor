@@ -5,6 +5,7 @@ import winston from "winston";
 import crypto from "crypto";
 import axios from "axios";
 import express from "express";
+require("dotenv").config();
 
 /**
  * TYPES
@@ -35,7 +36,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENTURL,
+    origin: "*",
   },
 });
 const timer = new Timer();
