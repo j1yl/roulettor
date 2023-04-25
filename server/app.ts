@@ -6,8 +6,6 @@ import crypto from "crypto";
 import axios from "axios";
 import express from "express";
 
-const CLIENTURL = "https://www.roulettor.com";
-
 /**
  * TYPES
  */
@@ -37,7 +35,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: CLIENTURL,
+    origin: process.env.CLIENTURL,
   },
 });
 const timer = new Timer();
@@ -113,7 +111,7 @@ timer.addEventListener("secondsUpdated", () => {
     rouletteGameData.status = "started";
 
     axios
-      .get(`${CLIENTURL}/api/roulette/start`)
+      .get(`${process.env.CLIENTURL}/api/roulette/start`)
       .then((data) => {
         rouletteGameData = data.data;
         logger.info(`${data.data.id} has started`);
@@ -129,7 +127,7 @@ timer.addEventListener("secondsUpdated", () => {
     rouletteGameData.color = getRollColor(rouletteGameData.value);
 
     axios
-      .post(`${CLIENTURL}/api/roulette/spin`, rouletteGameData)
+      .post(`${process.env.CLIENTURL}/api/roulette/spin`, rouletteGameData)
       .then((data) => {
         logger.info(`${data.data.id} has ended`);
         rouletteGameData.bets = [];
