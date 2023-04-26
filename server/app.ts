@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(process.env.PORT as number | undefined, "0.0.0.0", 1, () => {
+httpServer.listen(process.env.PORT || 5000, () => {
   console.log(`started on port ${process.env.PORT}`);
   timer.start({
     precision: "seconds",
@@ -97,9 +97,7 @@ const getRollColor = (spin: number) => {
 };
 
 const sendGameUpdate = (data: RouletteGameData) => {
-  io.emit("gameUpdate", {
-    ...data,
-  });
+  io.emit("gameUpdate", data);
 };
 
 /**
@@ -111,15 +109,14 @@ timer.addEventListener("secondsUpdated", () => {
   if (timer.getTimeValues().toString() === "00:01:00") {
     rouletteGameData.status = "started";
 
-    axios
-      .get(`${process.env.CLIENTURL}/api/roulette/start`)
-      .then((data) => {
-        rouletteGameData = data.data;
-        logger.info(`${data.data.id} has started`);
-      })
-      .catch((e) => {
-        logger.error(e);
+    try {
+      axios.get(`${process.env.CLIENTURL}/api/roulette/start`).then((res) => {
+        rouletteGameData = res.data;
+        logger.info(`${res.data.id} has started`);
       });
+    } catch (e) {
+      logger.error(e);
+    }
   }
 
   if (timer.getTimeValues().toString() === "00:00:00") {
@@ -127,15 +124,16 @@ timer.addEventListener("secondsUpdated", () => {
     rouletteGameData.value = getRollSpin(Date.now().toString());
     rouletteGameData.color = getRollColor(rouletteGameData.value);
 
-    axios
-      .post(`${process.env.CLIENTURL}/api/roulette/spin`, rouletteGameData)
-      .then((data) => {
-        logger.info(`${data.data.id} has ended`);
-        rouletteGameData.bets = [];
-      })
-      .catch((e) => {
-        logger.error(e);
-      });
+    try {
+      axios
+        .post(`${process.env.CLIENTURL}/api/roulette/spin`, rouletteGameData)
+        .then((res) => {
+          logger.info(`${res.data.id} has ended`);
+          rouletteGameData.bets = [];
+        });
+    } catch (e) {
+      logger.error(e);
+    }
   }
 
   sendGameUpdate(rouletteGameData);
