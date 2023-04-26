@@ -1,8 +1,9 @@
 import React, { createContext, useEffect, useState } from "react";
 import type { RouletteGameData } from "../types/game";
 import { io } from "socket.io-client";
+import { env } from "~/env.mjs";
 
-const socket = io("https://stat.roulettor.com", {
+const socket = io(env.NEXT_PUBLIC_SOCKET_URL, {
   autoConnect: false,
 });
 

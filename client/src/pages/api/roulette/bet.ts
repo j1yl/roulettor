@@ -1,8 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { io } from "socket.io-client";
+import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 
-const socket = io("https://stat.roulettor.com", {
+const socket = io(env.NEXT_PUBLIC_SOCKET_URL, {
   autoConnect: false,
 });
 

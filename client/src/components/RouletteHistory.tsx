@@ -12,7 +12,7 @@ interface Game {
 
 interface HistoryResponse {
   data: {
-    game: Game[];
+    lastFiftyGames: Game[];
   };
 }
 
@@ -27,23 +27,13 @@ const RouletteHistory = () => {
     void axios
       .get(`/api/roulette/history`)
       .then((res: HistoryResponse) => {
-        if (res.data.game) {
-          setRedCount(
-            res.data.game.filter((game) => {
-              return game.color === "red";
-            }).length
-          );
-          setBlackCount(
-            res.data.game.filter((game) => {
-              return game.color === "black";
-            }).length
-          );
-          setGreenCount(
-            res.data.game.filter((game) => {
-              return game.color === "green";
-            }).length
-          );
-        }
+        const { lastFiftyGames } = res.data;
+        const red = lastFiftyGames.filter((g) => g.color === "red");
+        const black = lastFiftyGames.filter((g) => g.color === "black");
+        const green = lastFiftyGames.filter((g) => g.color === "green");
+        setRedCount(red.length);
+        setBlackCount(black.length);
+        setGreenCount(green.length);
       })
       .catch();
   }, [rouletteGameContext]);
