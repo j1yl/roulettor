@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(process.env.PORT || 5000, () => {
+httpServer.listen(process.env.PORT as number | undefined, "0.0.0.0", 1, () => {
   console.log(`started on port ${process.env.PORT}`);
   timer.start({
     precision: "seconds",
