@@ -1,14 +1,12 @@
-import { useContext, useEffect, useRef } from "react";
-import { RouletteGameContext } from "../context/RouletteGameContext";
-
-// w-20 = 80px
+import { useEffect, useRef } from "react";
+import socket from "~/server/socket";
+import { RouletteGameData } from "~/types/game";
 
 const slot =
   "w-[75px] h-[75px] m-[3px] rounded-lg aspect-square flex justify-center items-center";
 
 const Spinner = () => {
   const myWheel = useRef<HTMLDivElement>(null);
-  const rouletteGameContext = useContext(RouletteGameContext);
 
   const choiceArray = [0, 11, 5, 10, 6, 9, 7, 8, 1, 14, 2, 13, 3, 12, 4];
 
@@ -41,9 +39,11 @@ const Spinner = () => {
 
   useEffect(() => {
     if (myWheel.current) {
-      if (rouletteGameContext?.rouletteGameData.status === "ended") {
-        spinWheel(rouletteGameContext?.rouletteGameData.value as number);
-      }
+      socket.on("gameUpdate", (data: RouletteGameData) => {
+        if (data.status === "ended") {
+          spinWheel(data.value as number);
+        }
+      });
     }
   });
 

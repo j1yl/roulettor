@@ -40,7 +40,6 @@ const io = new Server(httpServer, {
   },
 });
 const timer = new Timer();
-
 const logger = winston.createLogger({
   level: "info",
   transports: [
@@ -49,13 +48,11 @@ const logger = winston.createLogger({
   ],
 });
 
-// if (process.env.NODE_ENV !== "production") {
 logger.add(
   new winston.transports.Console({
     format: winston.format.simple(),
   })
 );
-// }
 
 io.on("connection", (socket) => {
   logger.info(`a user connected ${socket.id}`);
@@ -137,6 +134,7 @@ timer.addEventListener("secondsUpdated", () => {
   }
 
   sendGameUpdate(rouletteGameData);
+  console.log(rouletteGameData.clock);
 });
 
 timer.addEventListener("targetAchieved", () => {
