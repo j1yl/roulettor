@@ -11,8 +11,6 @@ const ssp = Source_Sans_Pro({
 import "~/styles/globals.css";
 import Navbar from "~/components/Navbar";
 
-import { RouletteGameContextProvider } from "~/context/RouletteGameContext";
-
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
@@ -22,10 +20,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <div className={ssp.className}>
         <div className="mx-auto max-w-6xl">
           <SessionProvider session={session}>
-            <RouletteGameContextProvider>
-              <Navbar />
-              <Component {...pageProps} />
-            </RouletteGameContextProvider>
+            <Navbar />
+            <Component {...pageProps} />
           </SessionProvider>
         </div>
       </div>

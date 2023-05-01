@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { RouletteGameContext } from "../context/RouletteGameContext";
+import React, { useEffect, useState } from "react";
+import socket from "~/server/socket";
 
 interface StatusBarProps {
   totalTimeInSeconds: number;
@@ -8,14 +8,13 @@ interface StatusBarProps {
 const StatusBar: React.FC<StatusBarProps> = ({ totalTimeInSeconds }) => {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [percentComplete, setPercentComplete] = useState(0);
-  const rouletteGameContext = useContext(RouletteGameContext);
 
   useEffect(() => {
-    setElapsedTime(rouletteGameContext.rouletteGameData.clock);
-    setPercentComplete(
-      (rouletteGameContext.rouletteGameData.clock / totalTimeInSeconds) * 100
-    );
-  }, [rouletteGameContext, totalTimeInSeconds]);
+    socket.on("gameUpdate", (data) => {
+      setElapsedTime(data.clock);
+      setPercentComplete((data.clock / totalTimeInSeconds) * 100);
+    });
+  }, []);
 
   return (
     <div className="rounded-lg">

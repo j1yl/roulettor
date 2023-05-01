@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import socket from "~/server/socket";
 interface BetState {
   status: string;
   betAmount: number;
@@ -16,10 +17,19 @@ const RoulettePanel = () => {
   //   console.log(response);
   // };
 
+  const [currentBets, setCurrentBets] = React.useState<BetState[]>([]);
+
+  useEffect(() => {
+    socket.on("gameUpdate", (data) => {
+      setCurrentBets(data.bets);
+    });
+  }, []);
+
   return (
     <>
       <div className="flex w-full flex-col gap-2">
         <button className="btn-primary btn-sm btn">Place Bet</button>
+        <div></div>
       </div>
       <div className="flex w-full flex-col gap-2">
         <button className="btn-sm btn bg-green-800 hover:bg-green-900">
