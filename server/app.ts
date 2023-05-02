@@ -3,7 +3,7 @@ import { Server } from "socket.io";
 import { Timer } from "easytimer.js";
 import winston from "winston";
 import crypto from "crypto";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 require("dotenv").config();
 
 /**
@@ -54,12 +54,29 @@ logger.add(
 
 io.on("connection", (socket) => {
   logger.info(`a user connected ${socket.id}`);
-  socket.on("betPlaced", (bet: RouletteBetData) => {
-    if (!rouletteGameData.bets.find((b) => b.id === bet.id)) {
-      logger.info(`bet received: ${bet.id} ${bet.betColor} ${bet.betAmount}`);
-      rouletteGameData.bets.push(bet);
+  socket.on(
+    "betPlaced",
+    (data: {
+      bet: {
+        id: string;
+        gameId: string;
+        userId: string;
+        betColor: string;
+        betAmount: number;
+        payout: number;
+        status: string;
+      };
+    }) => {
+      let { bet } = data;
+      if (
+        !rouletteGameData.bets.find((b) => b.id === bet.id) &&
+        bet !== undefined
+      ) {
+        logger.info(`bet received: ${bet.id} ${bet.betColor} ${bet.betAmount}`);
+        rouletteGameData.bets.push(bet);
+      }
     }
-  });
+  );
 });
 
 let rouletteGameData = {} as RouletteGameData;
