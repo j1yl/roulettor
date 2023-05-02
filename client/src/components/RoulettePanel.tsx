@@ -30,9 +30,8 @@ const RoulettePanel = () => {
       betAmount: betState.betAmount,
       betColor: color,
     };
-
-    await axios.post("/api/roulette/bet", betData);
-    socket.emit("betPlaced", betData);
+    const res = await axios.post("/api/roulette/bet", betData);
+    socket.emit("betPlaced", res.data);
   };
 
   useEffect(() => {
