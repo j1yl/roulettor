@@ -27,7 +27,7 @@ export default async function handler(
 
   const { id, status, value, color } = req.body as SpinRequest;
 
-  if (!id || !status || !value || !color) {
+  if (!id || !status || !color) {
     return res.status(400).json({
       message: "missing required data",
     });
