@@ -36,7 +36,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: "https://www.roulettor.com",
   },
 });
 const timer = new Timer();
