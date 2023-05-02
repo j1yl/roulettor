@@ -1,10 +1,12 @@
-import type { NextPage } from "next";
+import type { GetServerSidePropsContext, NextPage } from "next";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 
 import Roulette from "~/components/Roulette";
 
-export const getServerSideProps = async (context: any) => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const session = await getSession(context);
   if (!session) {
     return {
