@@ -73,12 +73,12 @@ const getRollSpin = (seed: string) => {
 };
 
 const getRollColor = (spin: number) => {
-  if (spin % 2 === 0) {
+  if (spin === 0) {
+    return "green";
+  } else if (spin % 2 === 0) {
     return "black";
   } else if (spin % 2 === 1) {
     return "red";
-  } else if (spin === 0) {
-    return "green";
   }
 };
 
