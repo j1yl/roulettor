@@ -55,8 +55,10 @@ logger.add(
 io.on("connection", (socket) => {
   logger.info(`a user connected ${socket.id}`);
   socket.on("betPlaced", (bet: RouletteBetData) => {
-    logger.info(`bet placed ${bet.id}`);
     rouletteGameData.bets.push(bet);
+    if (bet) {
+      logger.info(`Bet Received: ${bet.id} ${bet.betColor} ${bet.betAmount}`);
+    }
   });
 });
 
