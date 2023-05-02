@@ -36,11 +36,12 @@ const SignIn = ({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="flex h-screen flex-col items-center justify-center gap-4">
+        <p>Login</p>
         {Object.values(providers).map((provider) => (
           <div key={provider.name}>
             <button
               onClick={() => void signIn(provider.id)}
-              className="btn-outline btn"
+              className="btn-outline btn-wide btn"
             >
               Sign in with {provider.name}
             </button>

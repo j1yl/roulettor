@@ -37,10 +37,10 @@ const Navbar = () => {
               <Link href="/roulette">Roulette</Link>
             </li>
             <li>
-              <Link href="/lb">Leaderboard</Link>
+              <Link href="/dice">Dice</Link>
             </li>
             <li>
-              <Link href="/faq">FAQ</Link>
+              <Link href="/lb">Leaderboard</Link>
             </li>
           </ul>
         </div>
@@ -60,10 +60,10 @@ const Navbar = () => {
             <Link href="/roulette">Roulette</Link>
           </li>
           <li>
-            <Link href="/lb">Leaderboard</Link>
+            <Link href="/dice">Dice</Link>
           </li>
           <li>
-            <Link href="/faq">FAQ</Link>
+            <Link href="/lb">Leaderboard</Link>
           </li>
         </ul>
       </div>

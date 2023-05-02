@@ -11,14 +11,16 @@ interface BetState {
   gameId: string;
 }
 
-const RoulettePanel = () => {
+type Props = {
+  betAmount: number;
+  valid: boolean;
+};
+
+const RoulettePanel = (props: Props) => {
   const [currentBets, setCurrentBets] = useState<BetState[]>([]);
   const [currentGame, setCurrentGame] = useState({
     status: "",
     gameId: "",
-  });
-  const [betState, setBetState] = useState({
-    betAmount: 0,
   });
   const { data: session } = useSession();
   const handleBet = async (color: string) => {
@@ -26,7 +28,7 @@ const RoulettePanel = () => {
       userId: session?.user.id,
       gameId: currentGame.gameId,
       status: currentGame.status,
-      betAmount: betState.betAmount,
+      betAmount: props.betAmount,
       betColor: color,
     };
     const res = await axios.post("/api/roulette/bet", betData);
@@ -45,65 +47,23 @@ const RoulettePanel = () => {
 
   return (
     <>
-      <div className="btn-group btn-group-vertical md:btn-group-horizontal">
-        <button className="btn-outline btn-sm btn pointer-events-none">
-          Bet Amount: {betState.betAmount}
-        </button>
-        <button
-          className="btn-outline btn-sm btn"
-          onClick={() => {
-            setBetState({ ...betState, betAmount: betState.betAmount + 10 });
-          }}
-        >
-          +10
-        </button>
-        <button
-          className="btn-outline btn-sm btn"
-          onClick={() => {
-            setBetState({ ...betState, betAmount: betState.betAmount + 100 });
-          }}
-        >
-          +100
-        </button>
-        <button
-          className="btn-outline btn-sm btn"
-          onClick={() => {
-            setBetState({ ...betState, betAmount: betState.betAmount * 2 });
-          }}
-        >
-          x2
-        </button>
-        <button
-          className="btn-outline btn-sm btn"
-          onClick={() => {
-            setBetState({
-              ...betState,
-              betAmount: Math.floor(betState.betAmount / 2),
-            });
-          }}
-        >
-          1/2
-        </button>
-        <button
-          className="btn-outline btn-sm btn"
-          onClick={() => {
-            setBetState({
-              ...betState,
-              betAmount: 0,
-            });
-          }}
-        >
-          Reset
-        </button>
-      </div>
       <div className="flex flex-col gap-2 md:flex-row">
         <div className="flex w-full flex-col gap-2">
-          <button
-            className="btn-primary btn-sm btn"
-            onClick={() => void handleBet("red")}
-          >
-            Place Bet 2x
-          </button>
+          {props.valid ? (
+            <button
+              className="btn-primary btn-sm btn"
+              onClick={() => void handleBet("red")}
+            >
+              Place Bet 2x
+            </button>
+          ) : (
+            <button
+              className="btn-disabled btn-primary btn-sm btn bg-primary"
+              onClick={() => void handleBet("red")}
+            >
+              Place Bet 2x
+            </button>
+          )}
           {currentBets &&
             currentBets
               .filter((bet) => {
@@ -117,12 +77,21 @@ const RoulettePanel = () => {
               ))}
         </div>
         <div className="flex w-full flex-col gap-2">
-          <button
-            className="btn-sm btn bg-green-800 hover:bg-green-900"
-            onClick={() => void handleBet("green")}
-          >
-            Place Bet 14x
-          </button>
+          {props.valid ? (
+            <button
+              className="btn-sm btn bg-green-800 hover:bg-green-900"
+              onClick={() => void handleBet("red")}
+            >
+              Place Bet 2x
+            </button>
+          ) : (
+            <button
+              className="btn-disabled btn-sm btn bg-green-800 hover:bg-green-900"
+              onClick={() => void handleBet("green")}
+            >
+              Place Bet 14x
+            </button>
+          )}
           {currentBets &&
             currentBets
               .filter((bet) => {
@@ -136,12 +105,21 @@ const RoulettePanel = () => {
               ))}
         </div>
         <div className="flex w-full flex-col gap-2">
-          <button
-            className="btn-sm btn bg-zinc-800"
-            onClick={() => void handleBet("black")}
-          >
-            Place Bet 2x
-          </button>
+          {props.valid ? (
+            <button
+              className="btn-sm btn bg-zinc-800"
+              onClick={() => void handleBet("red")}
+            >
+              Place Bet 2x
+            </button>
+          ) : (
+            <button
+              className="btn-disabled btn-sm btn bg-zinc-800"
+              onClick={() => void handleBet("black")}
+            >
+              Place Bet 2x
+            </button>
+          )}
           {currentBets &&
             currentBets
               .filter((bet) => {
