@@ -1,6 +1,6 @@
-import { User } from "@prisma/client";
+import type { User } from "@prisma/client";
 import axios from "axios";
-import { GetServerSideProps, type NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { env } from "~/env.mjs";
@@ -9,10 +9,14 @@ interface Props {
   users: User[];
 }
 
+interface Response {
+  data: Props;
+}
+
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const { data } = await axios.get(`${env.NEXTAUTH_URL}/api/lb`);
+  const res: Response = await axios.get(`${env.NEXTAUTH_URL}/api/lb`);
   return {
-    props: data,
+    props: res.data,
   };
 };
 
