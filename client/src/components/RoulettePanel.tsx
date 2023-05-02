@@ -23,13 +23,16 @@ const RoulettePanel = () => {
   const { data: session } = useSession();
 
   const handleBet = async (color: string) => {
-    await axios.post("/api/roulette/bet", {
+    const betData = {
       userId: session?.user.id,
       gameId: currentGame.gameId,
       status: currentGame.status,
       betAmount: betState.betAmount,
       betColor: color,
-    });
+    };
+
+    await axios.post("/api/roulette/bet", betData);
+    socket.emit("betPlaced", betData);
   };
 
   useEffect(() => {
