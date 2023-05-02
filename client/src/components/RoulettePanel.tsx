@@ -1,12 +1,8 @@
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import React, { useContext, useState } from "react";
-import { RouletteGameContext } from "~/context/RouletteGameContext";
-import RouletteBetDisplay from "./RouletteBetDisplay";
-import RouletteHistory from "./RouletteHistory";
-
-const MAXBET = 10000;
-
+import React, { useEffect, useState } from "react";
+import type { RouletteGameData } from "~/types/game";
+import socket from "~/server/socket";
 interface BetState {
   status: string;
   betAmount: number;
@@ -16,168 +12,148 @@ interface BetState {
 }
 
 const RoulettePanel = () => {
-  const [betState, setBetState] = useState<BetState>({
-    status: "pending",
-    betAmount: 0,
-    betColor: "",
-    userId: "",
+  const [currentBets, setCurrentBets] = useState<BetState[]>([]);
+  const [currentGame, setCurrentGame] = useState({
+    status: "",
     gameId: "",
   });
-  const rouletteGameContext = useContext(RouletteGameContext);
+  const [betState, setBetState] = useState({
+    betAmount: 0,
+  });
   const { data: session } = useSession();
 
-  const handleBet = () => {
-    if (session?.user.id) {
-      betState.userId = session.user.id;
-      betState.gameId = rouletteGameContext.rouletteGameData.id;
-    }
-    void axios.post("/api/roulette/bet", betState).catch();
+  const handleBet = async (color: string) => {
+    await axios.post("/api/roulette/bet", {
+      userId: session?.user.id,
+      gameId: currentGame.gameId,
+      status: currentGame.status,
+      betAmount: betState.betAmount,
+      betColor: color,
+    });
   };
+
+  useEffect(() => {
+    socket.on("gameUpdate", (data: RouletteGameData) => {
+      setCurrentBets(data.bets);
+      setCurrentGame({
+        status: data.status,
+        gameId: data.id,
+      });
+    });
+  }, []);
 
   return (
     <>
-      <section className="flex w-full justify-between">
-        <RouletteHistory />
-        <div className="btn-group btn-group-vertical lg:btn-group-horizontal">
-          <button className="btn-outline btn-sm btn pointer-events-none">
-            Bet Amount: {betState.betAmount}
-          </button>
+      <div className="btn-group btn-group-vertical md:btn-group-horizontal">
+        <button className="btn-outline btn-sm btn pointer-events-none">
+          Bet Amount: {betState.betAmount}
+        </button>
+        <button
+          className="btn-outline btn-sm btn"
+          onClick={() => {
+            setBetState({ ...betState, betAmount: betState.betAmount + 10 });
+          }}
+        >
+          +10
+        </button>
+        <button
+          className="btn-outline btn-sm btn"
+          onClick={() => {
+            setBetState({ ...betState, betAmount: betState.betAmount + 100 });
+          }}
+        >
+          +100
+        </button>
+        <button
+          className="btn-outline btn-sm btn"
+          onClick={() => {
+            setBetState({ ...betState, betAmount: betState.betAmount * 2 });
+          }}
+        >
+          x2
+        </button>
+        <button
+          className="btn-outline btn-sm btn"
+          onClick={() => {
+            setBetState({
+              ...betState,
+              betAmount: Math.floor(betState.betAmount / 2),
+            });
+          }}
+        >
+          1/2
+        </button>
+        <button
+          className="btn-outline btn-sm btn"
+          onClick={() => {
+            setBetState({
+              ...betState,
+              betAmount: 0,
+            });
+          }}
+        >
+          Reset
+        </button>
+      </div>
+      <div className="flex flex-col gap-2 md:flex-row">
+        <div className="flex w-full flex-col gap-2">
           <button
-            className="btn-outline btn-sm btn"
-            onClick={() =>
-              setBetState({
-                ...betState,
-                betAmount: 0,
-              })
-            }
+            className="btn-primary btn-sm btn"
+            onClick={() => void handleBet("red")}
           >
-            Reset
+            Place Bet 2x
           </button>
-          <button
-            className="btn-outline btn-sm btn"
-            onClick={() =>
-              setBetState({
-                ...betState,
-                betAmount:
-                  betState.betAmount + 1 <= MAXBET
-                    ? betState.betAmount + 1
-                    : betState.betAmount,
+          {currentBets &&
+            currentBets
+              .filter((bet) => {
+                return bet.betColor === "red";
               })
-            }
-          >
-            +1
-          </button>
-          <button
-            className="btn-outline btn-sm btn"
-            onClick={() =>
-              setBetState({
-                ...betState,
-                betAmount:
-                  betState.betAmount + 10 <= MAXBET
-                    ? betState.betAmount + 10
-                    : betState.betAmount,
-              })
-            }
-          >
-            +10
-          </button>
-          <button
-            className="btn-outline btn-sm btn"
-            onClick={() =>
-              setBetState({
-                ...betState,
-                betAmount:
-                  betState.betAmount + 100 <= MAXBET
-                    ? betState.betAmount + 100
-                    : betState.betAmount,
-              })
-            }
-          >
-            +100
-          </button>
-          <button
-            className="btn-outline btn-sm btn"
-            onClick={() =>
-              setBetState({
-                ...betState,
-                betAmount:
-                  Math.floor(betState.betAmount / 2) === 0
-                    ? 0
-                    : Math.floor(betState.betAmount / 2),
-              })
-            }
-          >
-            1/2
-          </button>
-          <button
-            className="btn-outline btn-sm btn"
-            onClick={() =>
-              setBetState({
-                ...betState,
-                betAmount:
-                  betState.betAmount * 2 >= MAXBET
-                    ? MAXBET
-                    : betState.betAmount * 2,
-              })
-            }
-          >
-            x2
-          </button>
+              .map((bet, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span>{bet.betAmount}</span>
+                  <span>{bet.userId}</span>
+                </div>
+              ))}
         </div>
-      </section>
-      <section className="flex w-full justify-between gap-2">
-        <div className="w-full">
-          <div className="flex w-full items-center justify-center rounded-t-lg bg-base-300 p-2 font-bold">
-            <h2>Win 2x</h2>
-          </div>
-          <div className="flex w-full flex-col items-center justify-center gap-2 bg-base-300 p-2 font-bold">
-            <button
-              className="btn-primary btn w-full"
-              onClick={() => {
-                betState.betColor = "red";
-                handleBet();
-              }}
-            >
-              Place Bet
-            </button>
-            <RouletteBetDisplay color="red" />
-          </div>
+        <div className="flex w-full flex-col gap-2">
+          <button
+            className="btn-sm btn bg-green-800 hover:bg-green-900"
+            onClick={() => void handleBet("green")}
+          >
+            Place Bet 14x
+          </button>
+          {currentBets &&
+            currentBets
+              .filter((bet) => {
+                return bet.betColor === "green";
+              })
+              .map((bet, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span>{bet.betAmount}</span>
+                  <span>{bet.userId}</span>
+                </div>
+              ))}
         </div>
-        <div className="w-full">
-          <div className="flex w-full items-center justify-center rounded-t-lg bg-base-300 p-2 font-bold">
-            <h2>Win 14x</h2>
-          </div>
-          <div className="flex w-full flex-col items-center justify-center gap-2 bg-base-300 p-2 font-bold">
-            <button
-              className="btn-green btn w-full"
-              onClick={() => {
-                betState.betColor = "green";
-                handleBet();
-              }}
-            >
-              Place Bet
-            </button>
-            <RouletteBetDisplay color="green" />
-          </div>
+        <div className="flex w-full flex-col gap-2">
+          <button
+            className="btn-sm btn bg-zinc-800"
+            onClick={() => void handleBet("black")}
+          >
+            Place Bet 2x
+          </button>
+          {currentBets &&
+            currentBets
+              .filter((bet) => {
+                return bet.betColor === "black";
+              })
+              .map((bet, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span>{bet.betAmount}</span>
+                  <span>{bet.userId}</span>
+                </div>
+              ))}
         </div>
-        <div className="w-full">
-          <div className="flex w-full items-center justify-center rounded-t-lg bg-base-300 p-2 font-bold">
-            <h2>Win 2x</h2>
-          </div>
-          <div className="flex w-full flex-col items-center justify-center gap-2 bg-base-300 p-2 font-bold">
-            <button
-              className="btn-zinc btn w-full"
-              onClick={() => {
-                betState.betColor = "black";
-                handleBet();
-              }}
-            >
-              Place Bet
-            </button>
-            <RouletteBetDisplay color="black" />
-          </div>
-        </div>
-      </section>
+      </div>
     </>
   );
 };

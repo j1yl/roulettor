@@ -1,7 +1,7 @@
 import React from "react";
 import RouletteSpinner from "./RouletteSpinner";
-import StatusBar from "./StatusBar";
 import RoulettePanel from "./RoulettePanel";
+import StatusBar from "./StatusBar";
 
 const Roulette = () => {
   return (

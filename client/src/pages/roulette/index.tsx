@@ -1,9 +1,20 @@
 import type { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 import Roulette from "~/components/Roulette";
 
 const RoulettePage: NextPage = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!session)
+      router.push("/auth/signin").catch((err) => console.error(err));
+  }, [router, session]);
+
   return (
     <>
       <Head>

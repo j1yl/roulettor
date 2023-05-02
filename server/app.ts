@@ -40,7 +40,6 @@ const io = new Server(httpServer, {
   },
 });
 const timer = new Timer();
-
 const logger = winston.createLogger({
   level: "info",
   transports: [
@@ -49,13 +48,11 @@ const logger = winston.createLogger({
   ],
 });
 
-// if (process.env.NODE_ENV !== "production") {
 logger.add(
   new winston.transports.Console({
     format: winston.format.simple(),
   })
 );
-// }
 
 io.on("connection", (socket) => {
   logger.info(`a user connected ${socket.id}`);
@@ -65,7 +62,7 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen("0.0.0.0", () => {
+httpServer.listen(process.env.PORT || 5000, () => {
   console.log(`started on port ${process.env.PORT}`);
   timer.start({
     precision: "seconds",
@@ -137,6 +134,7 @@ timer.addEventListener("secondsUpdated", () => {
   }
 
   sendGameUpdate(rouletteGameData);
+  console.log(rouletteGameData.clock);
 });
 
 timer.addEventListener("targetAchieved", () => {
@@ -151,4 +149,8 @@ timer.addEventListener("targetAchieved", () => {
       startValues: { seconds: 65 },
     });
   }, 5000);
+});
+
+app.get("/game", (req, res) => {
+  res.send(rouletteGameData);
 });
