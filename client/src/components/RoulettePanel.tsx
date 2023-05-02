@@ -29,7 +29,6 @@ const RoulettePanel = () => {
       betAmount: betState.betAmount,
       betColor: color,
     });
-    console.log(response);
   };
 
   useEffect(() => {
@@ -44,18 +43,9 @@ const RoulettePanel = () => {
 
   return (
     <>
-      <div className="btn-group">
+      <div className="btn-group btn-group-vertical md:btn-group-horizontal">
         <button className="btn-outline btn-sm btn pointer-events-none">
           Bet Amount: {betState.betAmount}
-        </button>
-
-        <button
-          className="btn-outline btn-sm btn"
-          onClick={() => {
-            setBetState({ ...betState, betAmount: betState.betAmount + 1 });
-          }}
-        >
-          +1
         </button>
         <button
           className="btn-outline btn-sm btn"
@@ -104,63 +94,63 @@ const RoulettePanel = () => {
           Reset
         </button>
       </div>
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 md:flex-row">
         <div className="flex w-full flex-col gap-2">
           <button
             className="btn-primary btn-sm btn"
             onClick={() => handleBet("red")}
           >
-            Place Bet
+            Place Bet 2x
           </button>
-          {currentBets
-            .filter((bet) => {
-              return bet.betColor === "red";
-            })
-            .map((bet, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <p>
-                  {bet.betAmount} | {bet.userId}
-                </p>
-              </div>
-            ))}
+          {currentBets &&
+            currentBets
+              .filter((bet) => {
+                return bet.betColor === "red";
+              })
+              .map((bet, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span>{bet.betAmount}</span>
+                  <span>{bet.userId}</span>
+                </div>
+              ))}
         </div>
         <div className="flex w-full flex-col gap-2">
           <button
             className="btn-sm btn bg-green-800 hover:bg-green-900"
             onClick={() => handleBet("green")}
           >
-            Place Bet
+            Place Bet 14x
           </button>
-          {currentBets
-            .filter((bet) => {
-              return bet.betColor === "green";
-            })
-            .map((bet, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <p>
-                  {bet.betAmount} | {bet.userId}
-                </p>
-              </div>
-            ))}
+          {currentBets &&
+            currentBets
+              .filter((bet) => {
+                return bet.betColor === "green";
+              })
+              .map((bet, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span>{bet.betAmount}</span>
+                  <span>{bet.userId}</span>
+                </div>
+              ))}
         </div>
         <div className="flex w-full flex-col gap-2">
           <button
             className="btn-sm btn bg-zinc-800"
             onClick={() => handleBet("black")}
           >
-            Place Bet
+            Place Bet 2x
           </button>
-          {currentBets
-            .filter((bet) => {
-              return bet.betColor === "black";
-            })
-            .map((bet, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <p>
-                  {bet.betAmount} | {bet.userId}
-                </p>
-              </div>
-            ))}
+          {currentBets &&
+            currentBets
+              .filter((bet) => {
+                return bet.betColor === "black";
+              })
+              .map((bet, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span>{bet.betAmount}</span>
+                  <span>{bet.userId}</span>
+                </div>
+              ))}
         </div>
       </div>
     </>
