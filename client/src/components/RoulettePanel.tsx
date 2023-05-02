@@ -80,7 +80,7 @@ const RoulettePanel = (props: Props) => {
           {props.valid ? (
             <button
               className="btn-sm btn bg-green-800 hover:bg-green-900"
-              onClick={() => void handleBet("red")}
+              onClick={() => void handleBet("green")}
             >
               Place Bet 2x
             </button>
@@ -108,7 +108,7 @@ const RoulettePanel = (props: Props) => {
           {props.valid ? (
             <button
               className="btn-sm btn bg-zinc-800"
-              onClick={() => void handleBet("red")}
+              onClick={() => void handleBet("black")}
             >
               Place Bet 2x
             </button>

@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { Timer } from "easytimer.js";
 import winston from "winston";
 import crypto from "crypto";
@@ -111,6 +111,17 @@ const sendGameUpdate = (data: RouletteGameData) => {
 timer.addEventListener("secondsUpdated", () => {
   rouletteGameData.clock = timer.getTimeValues().seconds;
 
+  if (
+    timer.getTimeValues().toString() === "00:01:05" ||
+    timer.getTimeValues().toString() === "00:01:04" ||
+    timer.getTimeValues().toString() === "00:01:03" ||
+    timer.getTimeValues().toString() === "00:01:02" ||
+    timer.getTimeValues().toString() === "00:01:01"
+  ) {
+    rouletteGameData.clock = 0;
+    rouletteGameData.status = "preparing";
+  }
+
   if (timer.getTimeValues().toString() === "00:01:00") {
     rouletteGameData.status = "started";
 
@@ -150,6 +161,7 @@ timer.addEventListener("secondsUpdated", () => {
 timer.addEventListener("targetAchieved", () => {
   logger.info("pausing the game (5s)");
   timer.pause();
+  io.emit("reset");
   setTimeout(() => {
     logger.info("resuming the game");
     timer.reset();
