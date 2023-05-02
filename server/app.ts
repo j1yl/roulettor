@@ -4,7 +4,6 @@ import { Timer } from "easytimer.js";
 import winston from "winston";
 import crypto from "crypto";
 import axios from "axios";
-import express from "express";
 require("dotenv").config();
 
 /**
@@ -32,11 +31,10 @@ interface RouletteBetData {
 /**
  * INITIALIZATION
  */
-const app = express();
-const httpServer = createServer(app);
+const httpServer = createServer();
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://www.roulettor.com",
+    origin: "*",
   },
 });
 const timer = new Timer();
@@ -59,15 +57,6 @@ io.on("connection", (socket) => {
   socket.on("betPlaced", (bet: RouletteBetData) => {
     logger.info(`bet placed ${bet.id}`);
     rouletteGameData.bets.push(bet);
-  });
-});
-
-httpServer.listen(process.env.HOST || "0.0.0.0", 10, () => {
-  console.log(`started on port ${process.env.PORT}`);
-  timer.start({
-    precision: "seconds",
-    countdown: true,
-    startValues: { seconds: 65 },
   });
 });
 
@@ -134,7 +123,9 @@ timer.addEventListener("secondsUpdated", () => {
   }
 
   sendGameUpdate(rouletteGameData);
-  console.log(rouletteGameData.clock);
+  if (rouletteGameData.clock % 10 === 0) {
+    console.log(rouletteGameData.clock);
+  }
 });
 
 timer.addEventListener("targetAchieved", () => {
@@ -151,6 +142,16 @@ timer.addEventListener("targetAchieved", () => {
   }, 5000);
 });
 
-app.get("/game", (req, res) => {
-  res.send(rouletteGameData);
-});
+httpServer.listen(
+  parseInt(process.env.PORT as string) || 3001,
+  process.env.HOST || "0.0.0.0",
+  10,
+  () => {
+    console.log(`started on port ${process.env.PORT}`);
+    timer.start({
+      precision: "seconds",
+      countdown: true,
+      startValues: { seconds: 65 },
+    });
+  }
+);
