@@ -55,9 +55,9 @@ logger.add(
 io.on("connection", (socket) => {
   logger.info(`a user connected ${socket.id}`);
   socket.on("betPlaced", (bet: RouletteBetData) => {
-    rouletteGameData.bets.push(bet);
-    if (bet) {
-      logger.info(`Bet Received: ${bet.id} ${bet.betColor} ${bet.betAmount}`);
+    if (!rouletteGameData.bets.find((b) => b.id === bet.id)) {
+      logger.info(`bet received: ${bet.id} ${bet.betColor} ${bet.betAmount}`);
+      rouletteGameData.bets.push(bet);
     }
   });
 });

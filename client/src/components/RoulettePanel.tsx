@@ -21,7 +21,6 @@ const RoulettePanel = () => {
     betAmount: 0,
   });
   const { data: session } = useSession();
-
   const handleBet = async (color: string) => {
     const betData = {
       userId: session?.user.id,
@@ -31,7 +30,7 @@ const RoulettePanel = () => {
       betColor: color,
     };
     const res = await axios.post("/api/roulette/bet", betData);
-    socket.emit("betPlaced", res.data);
+    socket.emit("betPlaced", res.data.bet);
   };
 
   useEffect(() => {
