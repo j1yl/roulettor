@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
+import type { RouletteGameData } from "~/types/game";
 import socket from "~/server/socket";
 interface BetState {
   status: string;
@@ -22,7 +23,7 @@ const RoulettePanel = () => {
   const { data: session } = useSession();
 
   const handleBet = async (color: string) => {
-    const response = await axios.post("/api/roulette/bet", {
+    await axios.post("/api/roulette/bet", {
       userId: session?.user.id,
       gameId: currentGame.gameId,
       status: currentGame.status,
@@ -32,7 +33,7 @@ const RoulettePanel = () => {
   };
 
   useEffect(() => {
-    socket.on("gameUpdate", (data) => {
+    socket.on("gameUpdate", (data: RouletteGameData) => {
       setCurrentBets(data.bets);
       setCurrentGame({
         status: data.status,
@@ -98,7 +99,7 @@ const RoulettePanel = () => {
         <div className="flex w-full flex-col gap-2">
           <button
             className="btn-primary btn-sm btn"
-            onClick={() => handleBet("red")}
+            onClick={() => void handleBet("red")}
           >
             Place Bet 2x
           </button>
@@ -117,7 +118,7 @@ const RoulettePanel = () => {
         <div className="flex w-full flex-col gap-2">
           <button
             className="btn-sm btn bg-green-800 hover:bg-green-900"
-            onClick={() => handleBet("green")}
+            onClick={() => void handleBet("green")}
           >
             Place Bet 14x
           </button>
@@ -136,7 +137,7 @@ const RoulettePanel = () => {
         <div className="flex w-full flex-col gap-2">
           <button
             className="btn-sm btn bg-zinc-800"
-            onClick={() => handleBet("black")}
+            onClick={() => void handleBet("black")}
           >
             Place Bet 2x
           </button>

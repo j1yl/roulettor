@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import socket from "~/server/socket";
-import { RouletteGameData } from "~/types/game";
+import type { RouletteGameData } from "~/types/game";
 
 const slot =
   "w-[75px] h-[75px] m-[3px] rounded-lg aspect-square flex justify-center items-center";

@@ -150,3 +150,7 @@ timer.addEventListener("targetAchieved", () => {
     });
   }, 5000);
 });
+
+app.get("/game", (req, res) => {
+  res.send(rouletteGameData);
+});
