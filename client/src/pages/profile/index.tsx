@@ -90,6 +90,7 @@ const Profile: NextPage<Props> = ({ balance, bets }) => {
             <thead>
               <tr>
                 <th></th>
+                <th>Status</th>
                 <th>Transaction ID</th>
                 <th>Date</th>
                 <th>Color</th>
@@ -101,12 +102,22 @@ const Profile: NextPage<Props> = ({ balance, bets }) => {
               {bets.map((b) => (
                 <tr key={b.id}>
                   <th></th>
+                  <td>{b.status}</td>
                   <td>{b.id}</td>
                   <td>
                     {new Date(b.createdAt.toString()).toLocaleDateString()}
                   </td>
                   <td>{b.betColor}</td>
-                  <td>{b.betAmount}</td>
+                  <td
+                    style={
+                      b.status === "won"
+                        ? { color: "rgb(22,101,52)" }
+                        : { color: "#be123c" }
+                    }
+                  >
+                    {b.status === "won" ? "+" : "-"}
+                    {b.betAmount}
+                  </td>
                   <td>{b.gameId}</td>
                 </tr>
               ))}

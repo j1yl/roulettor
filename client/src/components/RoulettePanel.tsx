@@ -27,7 +27,7 @@ const RoulettePanel = (props: Props) => {
     const betData = {
       userId: session?.user.id,
       gameId: currentGame.gameId,
-      status: currentGame.status,
+      status: "pending",
       betAmount: props.betAmount,
       betColor: color,
     };
