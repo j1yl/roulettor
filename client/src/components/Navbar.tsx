@@ -37,10 +37,20 @@ const Navbar = () => {
               <Link href="/roulette">Roulette</Link>
             </li>
             <li>
+              <Link href="/dice">Dice</Link>
+            </li>
+            <li>
               <Link href="/lb">Leaderboard</Link>
             </li>
             <li>
-              <Link href="/faq">FAQ</Link>
+              <Link href="/profile">Profile</Link>
+            </li>
+            <li>
+              {session?.user ? (
+                <button onClick={() => void signOut()}>Logout</button>
+              ) : (
+                <Link href={"/auth/signin"}>Login</Link>
+              )}
             </li>
           </ul>
         </div>
@@ -60,21 +70,30 @@ const Navbar = () => {
             <Link href="/roulette">Roulette</Link>
           </li>
           <li>
+            <Link href="/dice">Dice</Link>
+          </li>
+          <li>
             <Link href="/lb">Leaderboard</Link>
           </li>
           <li>
-            <Link href="/faq">FAQ</Link>
+            <Link href="/profile">Profile</Link>
           </li>
         </ul>
       </div>
       <div className="navbar-end flex gap-0 md:gap-4">
         <Pouch />
         {session?.user ? (
-          <button onClick={() => void signOut()} className="btn-primary btn">
+          <button
+            onClick={() => void signOut()}
+            className="btn-primary btn hidden md:flex"
+          >
             Logout
           </button>
         ) : (
-          <Link href={"/auth/signin"} className="btn-primary btn">
+          <Link
+            href={"/auth/signin"}
+            className="btn-primary btn hidden md:flex"
+          >
             Login
           </Link>
         )}
