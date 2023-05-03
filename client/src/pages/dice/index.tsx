@@ -1,5 +1,5 @@
-import { GetServerSidePropsContext, type NextPage } from "next";
-import { Session } from "next-auth";
+import type { GetServerSidePropsContext, NextPage } from "next";
+import type { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 import Head from "next/head";
 
@@ -23,7 +23,7 @@ export const getServerSideProps = async (
   };
 };
 
-const Dice: NextPage<Props> = (props) => {
+const Dice: NextPage<Props> = () => {
   return (
     <>
       <Head>

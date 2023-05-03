@@ -43,6 +43,9 @@ const Navbar = () => {
               <Link href="/lb">Leaderboard</Link>
             </li>
             <li>
+              <Link href="/profile">Profile</Link>
+            </li>
+            <li>
               {session?.user ? (
                 <button onClick={() => void signOut()}>Logout</button>
               ) : (
@@ -71,6 +74,9 @@ const Navbar = () => {
           </li>
           <li>
             <Link href="/lb">Leaderboard</Link>
+          </li>
+          <li>
+            <Link href="/profile">Profile</Link>
           </li>
         </ul>
       </div>

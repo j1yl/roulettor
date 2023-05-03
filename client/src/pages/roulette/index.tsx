@@ -1,15 +1,15 @@
-import { User } from "@prisma/client";
-import axios from "axios";
-import type { GetServerSidePropsContext, NextPage } from "next";
-import { Session } from "next-auth";
-import { getSession } from "next-auth/react";
 import Head from "next/head";
-import BetStation from "~/components/BetStation";
+import axios from "axios";
+import { getSession } from "next-auth/react";
+import { env } from "~/env.mjs";
 
-import RoulettePanel from "~/components/RoulettePanel";
+import type { GetServerSidePropsContext, NextPage } from "next";
+import type { User } from "@prisma/client";
+import type { Session } from "next-auth";
+
+import BetStation from "~/components/BetStation";
 import RouletteSpinner from "~/components/RouletteSpinner";
 import RouletteStatusBar from "~/components/RouletteStatusBar";
-import { env } from "~/env.mjs";
 
 type Props = {
   session: Session;
@@ -39,7 +39,7 @@ export const getServerSideProps = async (
   };
 };
 
-const RoulettePage: NextPage<Props> = ({ session, balance }) => {
+const RoulettePage: NextPage<Props> = ({ balance }) => {
   return (
     <>
       <Head>

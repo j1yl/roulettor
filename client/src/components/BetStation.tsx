@@ -17,7 +17,7 @@ const BetStation = (props: Props) => {
     } else {
       setValid(true);
     }
-  });
+  }, [betAmount, balance]);
 
   return (
     <>

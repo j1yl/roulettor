@@ -1,9 +1,9 @@
 import { type AppType } from "next/app";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
-import { Source_Sans_Pro } from "next/font/google";
+import { Poppins } from "next/font/google";
 
-const ssp = Source_Sans_Pro({
+const pop = Poppins({
   weight: "400",
   subsets: ["latin"],
 });
@@ -17,7 +17,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   return (
     <div className="h-full w-full">
-      <div className={ssp.className}>
+      <div className={pop.className}>
         <div className="mx-auto max-w-6xl">
           <SessionProvider session={session}>
             <Navbar />
