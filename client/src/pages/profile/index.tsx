@@ -4,6 +4,7 @@ import { prisma } from "~/server/db";
 import axios from "axios";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import type { Bet } from "@prisma/client";
+import { env } from "~/env.mjs";
 
 type Props = {
   balance: number;
@@ -22,29 +23,40 @@ export const getServerSideProps = async (
     };
   }
 
-  const bets = await prisma.bet.findMany({
-    where: {
-      userId: session.user.id,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  try {
+    const bets = await prisma.bet.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-  const res: {
-    data: {
-      user: {
-        balance: number;
+    const res: {
+      data: {
+        user: {
+          balance: number;
+        };
       };
+    } = await axios.get(
+      `${env.NEXT_PUBLIC_BASE_URL}/api/user/${session.user.id}`
+    );
+
+    return {
+      props: {
+        balance: res.data.user.balance,
+        bets: JSON.parse(JSON.stringify(bets)) as Bet[],
+      },
     };
-  } = await axios.get(
-    `${process.env.NEXTAUTH_URL as string}/api/user/${session.user.id}`
-  );
+  } catch (e) {
+    console.error(e);
+  }
 
   return {
     props: {
-      balance: res.data.user.balance,
-      bets: JSON.parse(JSON.stringify(bets)) as Bet[],
+      balance: 0,
+      bets: [],
     },
   };
 };

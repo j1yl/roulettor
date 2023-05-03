@@ -28,14 +28,26 @@ export const getServerSideProps = async (
     };
   }
 
-  const res: {
-    data: {
-      user: User;
+  try {
+    const res: {
+      data: {
+        user: User;
+      };
+    } = await axios.get(
+      `${env.NEXT_PUBLIC_BASE_URL}/api/user/${session.user.id}`
+    );
+    return {
+      props: { session, balance: res.data.user.balance },
     };
-  } = await axios.get(`${env.NEXTAUTH_URL}/api/user/${session.user.id}`);
+  } catch (e) {
+    console.error(e);
+  }
 
   return {
-    props: { session, balance: res.data.user.balance },
+    props: {
+      session,
+      balance: 0,
+    },
   };
 };
 

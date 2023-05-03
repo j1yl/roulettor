@@ -23,7 +23,7 @@ export const getServerSideProps = async (
   };
 };
 
-const Dice: NextPage<Props> = () => {
+const Coinflip: NextPage<Props> = () => {
   return (
     <>
       <Head>
@@ -38,4 +38,4 @@ const Dice: NextPage<Props> = () => {
   );
 };
 
-export default Dice;
+export default Coinflip;

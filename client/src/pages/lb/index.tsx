@@ -14,9 +14,18 @@ interface Response {
 }
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const res: Response = await axios.get(`${env.NEXTAUTH_URL}/api/lb`);
+  try {
+    const res: Response = await axios.get(`${env.NEXT_PUBLIC_BASE_URL}/api/lb`);
+    return {
+      props: res.data,
+    };
+  } catch (e) {
+    console.error(e);
+  }
   return {
-    props: res.data,
+    props: {
+      users: [],
+    },
   };
 };
 

@@ -37,9 +37,6 @@ const Navbar = () => {
               <Link href="/roulette">Roulette</Link>
             </li>
             <li>
-              <Link href="/dice">Dice</Link>
-            </li>
-            <li>
               <Link href="/lb">Leaderboard</Link>
             </li>
             <li>
@@ -68,9 +65,6 @@ const Navbar = () => {
           </li>
           <li>
             <Link href="/roulette">Roulette</Link>
-          </li>
-          <li>
-            <Link href="/dice">Dice</Link>
           </li>
           <li>
             <Link href="/lb">Leaderboard</Link>
