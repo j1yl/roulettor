@@ -62,7 +62,6 @@ const RoulettePage: NextPage<Props> = ({ balance }) => {
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-4">
         <RouletteSpinner />
         <RouletteStatusBar totalTimeInSeconds={60} />
-        {/* <RoulettePanel /> */}
         <BetStation balance={balance} game="roulette" />
       </main>
     </>
