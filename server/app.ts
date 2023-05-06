@@ -69,8 +69,8 @@ io.on("connection", (socket) => {
     }) => {
       let { bet } = data;
       if (
-        !rouletteGameData.bets.find((b) => b.id === bet.id) &&
-        bet !== undefined
+        bet !== undefined &&
+        !rouletteGameData.bets.find((b) => b.id === bet.id)
       ) {
         logger.info(`bet received: ${bet.id} ${bet.betColor} ${bet.betAmount}`);
         rouletteGameData.bets.push(bet);
