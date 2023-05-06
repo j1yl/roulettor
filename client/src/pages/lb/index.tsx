@@ -63,7 +63,12 @@ const Leaderboard: NextPage<Props> = ({ users }) => {
                   </div>
                 </td>
                 <td>{u.balance}</td>
-                <td>{u.id}</td>
+                <td>
+                  {u.id
+                    .substring(4, u.id.length - 4)
+                    .replace(/[a-z\d]/gi, "*") +
+                    u.id.substring(u.id.length - 4)}
+                </td>
                 <td>
                   {u.email?.replace(/(\w{3})[\w.-]+@([\w.]+\w)/, "$1***@$2")}
                 </td>

@@ -48,6 +48,19 @@ export default async function handler(
       });
     }
 
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (user && user.balance < betAmount) {
+      return res.status(400).json({
+        message: "user does not have enough balance",
+        user,
+      });
+    }
+
     const bet = await prisma.bet.create({
       data: {
         status,
