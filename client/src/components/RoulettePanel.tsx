@@ -72,7 +72,12 @@ const RoulettePanel = (props: Props) => {
               .map((bet, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span>{bet.betAmount}</span>
-                  <span>{bet.userId}</span>
+                  <span>
+                    {bet.userId
+                      .substring(4, bet.userId.length - 4)
+                      .replace(/[a-z\d]/gi, "*") +
+                      bet.userId.substring(bet.userId.length - 4)}
+                  </span>
                 </div>
               ))}
         </div>
@@ -133,7 +138,12 @@ const RoulettePanel = (props: Props) => {
               .map((bet, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span>{bet.betAmount}</span>
-                  <span>{bet.userId}</span>
+                  <span>
+                    {bet.userId
+                      .substring(4, bet.userId.length - 4)
+                      .replace(/[a-z\d]/gi, "*") +
+                      bet.userId.substring(bet.userId.length - 4)}
+                  </span>
                 </div>
               ))}
         </div>
