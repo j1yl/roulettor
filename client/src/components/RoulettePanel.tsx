@@ -82,7 +82,7 @@ const RoulettePanel = (props: Props) => {
               className="btn-sm btn bg-green-800 hover:bg-green-900"
               onClick={() => void handleBet("green")}
             >
-              Place Bet 2x
+              Place Bet 14x
             </button>
           ) : (
             <button
