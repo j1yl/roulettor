@@ -61,6 +61,12 @@ export default async function handler(
       });
     }
 
+    if (betAmount < 1) {
+      return res.status(400).json({
+        message: "bet amount must be greater than 0",
+      });
+    }
+
     const bet = await prisma.bet.create({
       data: {
         status,
