@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 
 interface SpinRequest {
@@ -23,6 +24,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (req.query.key !== env.API_PASSWORD) {
+    return res.status(401).end();
+  }
+
   if (req.method !== "POST") return res.status(405).end();
 
   const { id, status, value, color } = req.body as SpinRequest;

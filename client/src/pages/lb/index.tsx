@@ -15,13 +15,13 @@ interface Response {
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
-    const res: Response = await axios.get(`${env.NEXT_PUBLIC_BASE_URL}/api/lb`);
+    const res: Response = await axios.get(
+      `${env.NEXT_PUBLIC_BASE_URL}/api/lb/?key=${env.API_PASSWORD}`
+    );
     return {
       props: res.data,
     };
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) {}
   return {
     props: {
       users: [],
