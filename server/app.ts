@@ -1,9 +1,9 @@
 import { createServer } from "http";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { Timer } from "easytimer.js";
 import winston from "winston";
 import crypto from "crypto";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 require("dotenv").config();
 
 /**
@@ -126,10 +126,14 @@ timer.addEventListener("secondsUpdated", () => {
     rouletteGameData.status = "started";
 
     try {
-      axios.get(`${process.env.CLIENTURL}/api/roulette/start`).then((res) => {
-        rouletteGameData = res.data;
-        logger.info(`${res.data.id} has started`);
-      });
+      axios
+        .get(
+          `${process.env.CLIENTURL}/api/roulette/start?key=${process.env.API_PASSWORD}`
+        )
+        .then((res) => {
+          rouletteGameData = res.data;
+          logger.info(`${res.data.id} has started`);
+        });
     } catch (e) {
       logger.error(e);
     }
@@ -142,7 +146,10 @@ timer.addEventListener("secondsUpdated", () => {
 
     try {
       axios
-        .post(`${process.env.CLIENTURL}/api/roulette/spin`, rouletteGameData)
+        .post(
+          `${process.env.CLIENTURL}/api/roulette/spin?key=${process.env.API_PASSWORD}`,
+          rouletteGameData
+        )
         .then((res) => {
           logger.info(`${res.data.id} has ended`);
           rouletteGameData.bets = [];
