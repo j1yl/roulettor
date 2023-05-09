@@ -72,7 +72,12 @@ const RoulettePanel = (props: Props) => {
               .map((bet, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span>{bet.betAmount}</span>
-                  <span>{bet.userId}</span>
+                  <span>
+                    {bet.userId
+                      .substring(4, bet.userId.length - 4)
+                      .replace(/[a-z\d]/gi, "*") +
+                      bet.userId.substring(bet.userId.length - 4)}
+                  </span>
                 </div>
               ))}
         </div>
@@ -82,7 +87,7 @@ const RoulettePanel = (props: Props) => {
               className="btn-sm btn bg-green-800 hover:bg-green-900"
               onClick={() => void handleBet("green")}
             >
-              Place Bet 2x
+              Place Bet 14x
             </button>
           ) : (
             <button
@@ -100,7 +105,12 @@ const RoulettePanel = (props: Props) => {
               .map((bet, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span>{bet.betAmount}</span>
-                  <span>{bet.userId}</span>
+                  <span>
+                    {bet.userId
+                      .substring(4, bet.userId.length - 4)
+                      .replace(/[a-z\d]/gi, "*") +
+                      bet.userId.substring(bet.userId.length - 4)}
+                  </span>
                 </div>
               ))}
         </div>
@@ -128,7 +138,12 @@ const RoulettePanel = (props: Props) => {
               .map((bet, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <span>{bet.betAmount}</span>
-                  <span>{bet.userId}</span>
+                  <span>
+                    {bet.userId
+                      .substring(4, bet.userId.length - 4)
+                      .replace(/[a-z\d]/gi, "*") +
+                      bet.userId.substring(bet.userId.length - 4)}
+                  </span>
                 </div>
               ))}
         </div>
