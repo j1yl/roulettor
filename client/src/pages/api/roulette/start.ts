@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { env } from "~/env.mjs";
 import { prisma } from "~/server/db";
 import type { RouletteGameData } from "~/types/game";
 
@@ -6,6 +7,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<RouletteGameData>
 ) {
+  if (req.query.key !== env.API_PASSWORD) {
+    return res.status(401).end();
+  }
+
   if (req.method !== "GET") return res.status(405).end();
 
   try {

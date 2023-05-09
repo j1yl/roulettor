@@ -20,6 +20,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (req.query.key !== env.API_PASSWORD) {
+    return res.status(401).end();
+  }
+
   socket.connect();
 
   if (req.method !== "POST") return res.status(405).end();
