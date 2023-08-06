@@ -2,9 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-} */
+  --black: #121212;
+  --red: #902D2D;
+  --green: #5F902D;
+  --gold: #FF8F28;
+  --text: #FBFBFB;
+  --background-darker: #17191C;
+  --background: #1F2225;
+  --background-100: #2D3237;
+  --background-200: #42484F;
+}
+
+body {
+  background: var(--background);
+}
+
+@layer components {
+  .rouletteslot {
+    @apply w-[75px] h-[75px] m-[3px] rounded aspect-square flex justify-center items-center
+  }
+  .btn {
+    @apply px-4 py-2 w-max bg-100 text-sm rounded hover:bg-200 active:bg-100 transition-colors duration-200 ease-in-out cursor-pointer
+  }
+}
