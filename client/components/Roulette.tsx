@@ -1,15 +1,19 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 
-type Props = {};
+type Props = {
+  balance: number;
+};
+
+const choiceArray = [0, 11, 5, 10, 6, 9, 7, 8, 1, 14, 2, 13, 3, 12, 4];
 
 const Roulette = (props: Props) => {
   const [betAmount, setBetAmount] = useState(0);
+  const [nextGameTime, setNextGameTime] = useState(0);
 
   const myWheel = useRef<HTMLDivElement>(null);
-
-  const choiceArray = [0, 11, 5, 10, 6, 9, 7, 8, 1, 14, 2, 13, 3, 12, 4];
 
   const spinWheel = (result: number) => {
     const position = choiceArray.indexOf(result);
@@ -50,6 +54,26 @@ const Roulette = (props: Props) => {
       // black
     }
   }
+
+  useEffect(() => {
+    const socket = io(process.env.NEXT_PUBLIC_API_URL as string, {
+      transports: ["websocket"],
+    });
+
+    if (socket) {
+      socket.on("connect", () => {
+        console.log("connected", socket.id);
+
+        socket.on("nextGameStart", (data: { nextGameStartTime: number }) => {
+          setNextGameTime(data.nextGameStartTime);
+        });
+      });
+    }
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <div className="flex p-4 flex-col gap-4 w-full justify-center items-center">
@@ -95,6 +119,7 @@ const Roulette = (props: Props) => {
           <button className="btn" onClick={() => spinWheel(10)}>
             SPIN
           </button>
+          <span className="btn">{nextGameTime}</span>
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-4 grid-cols-1 w-full">
