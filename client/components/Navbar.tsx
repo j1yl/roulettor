@@ -10,7 +10,7 @@ const Navbar = (props: Props) => {
   const { data: session } = useSession();
 
   return (
-    <nav className="flex p-4 justify-between w-full items-center z-50 absolute top-0 left-0">
+    <nav className="flex p-4 justify-between w-full items-center">
       <div className="flex">
         <h1>Roulettor</h1>
       </div>

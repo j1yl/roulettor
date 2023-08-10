@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { Bet, RouletteGameState } from "./gameTypes";
 import prisma from "../db";
 import { Server } from "socket.io";
+import { io } from "../server";
 
 export let rouletteGameState: RouletteGameState = {
   rouletteNumber: null,
@@ -9,6 +10,7 @@ export let rouletteGameState: RouletteGameState = {
 };
 
 export function resetGame() {
+  console.log(`resetting game ${new Date().toLocaleTimeString()}`);
   rouletteGameState = {
     rouletteNumber: null,
     bets: [],
@@ -24,21 +26,29 @@ export function randomRouletteNumber() {
 }
 
 export function spinTheWheel() {
+  console.log(`\nspinning the wheel ${new Date().toLocaleTimeString()}`);
   rouletteGameState.rouletteNumber = randomRouletteNumber();
+  io.emit("spinResult", {
+    rouletteNumber: rouletteGameState.rouletteNumber,
+  });
+  console.log(`- ${rouletteGameState.rouletteNumber}`);
 }
 
 export async function placeBet(
   userId: string,
-  number: number,
   amount: number,
   color: "red" | "black" | "green"
 ) {
-  const bet: Bet = { userId, number, amount, color };
-
+  const bet: Bet = { userId, amount, color };
   rouletteGameState.bets.push(bet);
 }
 
+export function getBets() {
+  return rouletteGameState.bets;
+}
+
 export function evaluateBets() {
+  console.log(`evaluating bets ${new Date().toLocaleTimeString()}`);
   const winningNumber = randomRouletteNumber();
   let winningColor = "";
 
@@ -64,8 +74,23 @@ export function evaluateBets() {
           winnings = bet.amount * 14;
           break;
       }
+      console.log(`- ${bet.userId} won ${winnings}`);
       addBalanceToUser(bet.userId, winnings);
+    } else {
+      console.log(`- ${bet.userId} lost ${bet.amount}`);
+      removeBalanceFromUser(bet.userId, bet.amount);
     }
+  });
+}
+
+export async function removeBalanceFromUser(userId: string, amount: number) {
+  await prisma.user.update({
+    where: { id: parseInt(userId) },
+    data: {
+      balance: {
+        decrement: amount,
+      },
+    },
   });
 }
 
@@ -83,20 +108,26 @@ export async function addBalanceToUser(userId: string, amount: number) {
 export let nextGameStartTime: number;
 
 export function startGameLoop(io: Server) {
-  const gameInterval = 5000; // 60 secs
+  const gameInterval = 30000;
+  const pauseInterval = 5000;
 
   const runGame = async () => {
-    spinTheWheel();
-    evaluateBets();
-    resetGame();
+    nextGameStartTime = Date.now() + gameInterval + pauseInterval;
 
-    nextGameStartTime = Date.now() + gameInterval;
-
-    console.log("new game", nextGameStartTime);
+    console.log(
+      "next game at",
+      new Date(nextGameStartTime).toLocaleTimeString()
+    );
 
     io.emit("nextGameStart", { nextGameStartTime });
 
-    setTimeout(runGame, gameInterval);
+    setTimeout(() => {
+      spinTheWheel();
+      evaluateBets();
+      resetGame();
+
+      setTimeout(runGame, gameInterval);
+    }, pauseInterval);
   };
 
   runGame();

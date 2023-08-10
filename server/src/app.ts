@@ -1,16 +1,16 @@
 import express from "express";
 import cors from "cors";
-import userRoutes from "./routes/userRoutes";
+import router from "./routes/router";
 
 const app = express();
 const corsOptions = {
-  origin: process.env.CLIENT_URL,
+  origin: "*",
 };
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors(corsOptions));
-app.use("/", userRoutes);
+app.use("/", router);
 
 export default app;

@@ -28,6 +28,7 @@ export async function createUser(req: Request, res: Response) {
           id: parseInt(id),
           name,
           email,
+          balance: 100,
         },
       });
     }

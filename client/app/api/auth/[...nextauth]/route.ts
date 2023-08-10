@@ -12,7 +12,7 @@ const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     signIn: async (data) => {
-      const { user, account, profile } = data;
+      const { user } = data;
 
       try {
         const response = await axios.post(
@@ -24,17 +24,27 @@ const authOptions: NextAuthOptions = {
           }
         );
 
-        if (response.data && response.data.id) {
-          user.id = response.data.id;
-          user.balance = response.data.balance;
-        }
+        user.userId = response.data.id;
+        user.balance = response.data.balance;
       } catch (error) {
         console.error("Error syncing user data with Express server:", error);
       }
+
       return true;
     },
-    session: async (data: { user: User; session: Session }) => {
-      const { session } = data;
+    session: async ({ session, token }) => {
+      const userId = token.sub;
+      session.user.userId = userId as string;
+
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/${userId}`
+        );
+
+        session.user.balance = response.data.balance;
+      } catch (error) {
+        console.error("Error fetching user data from Express server:", error);
+      }
 
       return session;
     },

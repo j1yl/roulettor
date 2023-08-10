@@ -1,13 +1,22 @@
+import { Server, Socket } from "socket.io";
 import http from "http";
-import { Server } from "socket.io";
+
 import app from "./app";
-import setupSockets from "./sockets";
-import { startGameLoop } from "./roulette/gameState";
+import {
+  startGameLoop,
+  getBets,
+  nextGameStartTime,
+} from "./roulette/gameState";
 
 const server = http.createServer(app);
-const io = new Server(server);
+export const io = new Server(server);
 
-setupSockets(io);
+io.on("connection", (socket: Socket) => {
+  socket.emit("existingBets", getBets());
+  socket.emit("nextGameStart", { nextGameStartTime });
+
+  console.log("A user connected", socket.id);
+});
 
 server.listen(process.env.PORT || 3001, () => {
   console.log(`Listening on *:${process.env.PORT || 3000}`);

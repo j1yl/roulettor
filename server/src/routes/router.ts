@@ -1,4 +1,5 @@
-import express from "express";
+import { Router } from "express";
+import { createBet } from "../controllers/betController";
 import {
   createUser,
   deleteUser,
@@ -6,8 +7,9 @@ import {
   updateUser,
 } from "../controllers/userController";
 
-const router = express.Router();
+const router = Router();
 
+router.post("/api/bet", createBet);
 router.get("/api/user/:id", getUser);
 router.put("/api/user/:id", updateUser);
 router.post("/api/user", createUser);

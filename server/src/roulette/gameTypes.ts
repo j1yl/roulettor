@@ -5,7 +5,6 @@ export type RouletteGameState = {
 
 export type Bet = {
   userId: string;
-  number: number;
   color: "red" | "black" | "green";
   amount: number;
 };

@@ -1,20 +1,19 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
 import { io } from "socket.io-client";
+import { useSession } from "next-auth/react";
 
-type Props = {
-  balance: number;
-};
+type Props = {};
 
 const choiceArray = [0, 11, 5, 10, 6, 9, 7, 8, 1, 14, 2, 13, 3, 12, 4];
 
 const Roulette = (props: Props) => {
-  const [betAmount, setBetAmount] = useState(0);
-  const [nextGameTime, setNextGameTime] = useState(0);
-
+  /**
+   * Wheel Logic
+   */
   const myWheel = useRef<HTMLDivElement>(null);
-
   const spinWheel = (result: number) => {
     const position = choiceArray.indexOf(result);
     const rows = 12;
@@ -42,16 +41,38 @@ const Roulette = (props: Props) => {
     }, 3 * 1000);
   };
 
+  const { data: session } = useSession();
+
+  const [betAmount, setBetAmount] = useState(0);
+  const [nextGameTime, setNextGameTime] = useState(0);
+
   async function handleBet(color: number) {
     if (betAmount === 0) return;
 
-    switch (color) {
-      case -1:
-      // red
-      case 0:
-      // green
-      case 1:
-      // black
+    if (!session?.user.userId) return;
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/bet`,
+        {
+          amount: betAmount,
+          color: color === 0 ? "green" : color === -1 ? "red" : "black",
+          userId: session?.user.userId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": process.env.NEXT_PUBLIC_API_URL,
+            "Access-Control-Allow-Methods": "POST",
+            "Access-Control-Allow-Headers": "Content-Type",
+          },
+        }
+      );
+      if (response.status === 200) {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -62,11 +83,18 @@ const Roulette = (props: Props) => {
 
     if (socket) {
       socket.on("connect", () => {
-        console.log("connected", socket.id);
-
         socket.on("nextGameStart", (data: { nextGameStartTime: number }) => {
           setNextGameTime(data.nextGameStartTime);
         });
+
+        socket.on("spinResult", (data: { rouletteNumber: number }) => {
+          spinWheel(data.rouletteNumber);
+        });
+
+        // socket.on(
+        //   "newBet",
+        //   (data: { userId: string; amount: number; color: string }) => {}
+        // );
       });
     }
 
@@ -116,10 +144,6 @@ const Roulette = (props: Props) => {
           <button onClick={() => setBetAmount(betAmount + 10)} className="btn">
             +10
           </button>
-          <button className="btn" onClick={() => spinWheel(10)}>
-            SPIN
-          </button>
-          <span className="btn">{nextGameTime}</span>
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-4 grid-cols-1 w-full">
