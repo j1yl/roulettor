@@ -2,11 +2,11 @@ import "./globals.css";
 import type { Metadata } from "next";
 import NextAuthProvider from "@/components/NextAuthProviderr";
 import Navbar from "@/components/Navbar";
-import { Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 
-const poppins = Poppins({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -22,10 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <NextAuthProvider>
-        <body className={poppins.className}>
-          <div className="max-w-screen-xl mx-auto relative w-full text-text">
+        <body className={inter.className}>
+          <div className="mx-auto max-w-6xl">
             <Navbar />
             {children}
+            <Toaster />
           </div>
         </body>
       </NextAuthProvider>

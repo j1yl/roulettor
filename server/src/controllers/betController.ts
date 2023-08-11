@@ -8,6 +8,9 @@ export async function createBet(req: Request, res: Response) {
   try {
     const { userId, amount, color } = req.body as Bet;
 
+    if (req.headers.secret !== (process.env.SECRET as string))
+      return res.status(401).json({ error: "Unauthorized" });
+
     if (!userId || !amount || !color) {
       return res.status(400).json({ error: "Missing required fields" });
     }
@@ -40,7 +43,7 @@ export async function createBet(req: Request, res: Response) {
 
     placeBet(userId, amount, color);
 
-    console.log("Bet placed:", { userId, amount, color });
+    console.log("bet placed:", userId, amount, color);
 
     io.emit("newBet", {
       userId,

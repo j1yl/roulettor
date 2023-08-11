@@ -14,11 +14,10 @@ export const io = new Server(server);
 io.on("connection", (socket: Socket) => {
   socket.emit("existingBets", getBets());
   socket.emit("nextGameStart", { nextGameStartTime });
-
-  console.log("A user connected", socket.id);
+  console.log("a player connected", socket.id);
 });
 
 server.listen(process.env.PORT || 3001, () => {
-  console.log(`Listening on *:${process.env.PORT || 3000}`);
+  console.log(`listening on *:${process.env.PORT || 3000}`);
   startGameLoop(io);
 });

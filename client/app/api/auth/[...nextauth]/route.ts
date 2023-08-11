@@ -21,6 +21,11 @@ const authOptions: NextAuthOptions = {
             id: user.id,
             name: user.name,
             email: user.email,
+          },
+          {
+            headers: {
+              secret: process.env.SECRET,
+            },
           }
         );
 

@@ -20,6 +20,9 @@ export async function getUser(req: Request, res: Response) {
 
 export async function createUser(req: Request, res: Response) {
   try {
+    if (req.headers.secret !== (process.env.SECRET as string))
+      return res.status(401).json({ error: "Unauthorized" });
+
     const { id, name, email } = req.body;
     let user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
@@ -41,17 +44,20 @@ export async function createUser(req: Request, res: Response) {
 
 export async function updateUser(req: Request, res: Response) {
   try {
+    if (req.headers.secret !== (process.env.SECRET as string))
+      return res.status(401).json({ error: "Unauthorized" });
+
     const userId = parseInt(req.params.id);
     const { balance } = req.body;
 
-    if (!balance || typeof balance !== "string") {
+    if (!balance || typeof balance !== "number") {
       return res.status(400).json({ error: "Invalid balance" });
     }
 
     const user = await prisma.user.update({
       where: { id: userId },
       data: {
-        balance: parseInt(balance),
+        balance: balance,
       },
     });
     res.json(user);
@@ -62,6 +68,9 @@ export async function updateUser(req: Request, res: Response) {
 }
 
 export async function deleteUser(req: Request, res: Response) {
+  if (req.headers.secret !== (process.env.SECRET as string))
+    return res.status(401).json({ error: "Unauthorized" });
+
   try {
     const userId = parseInt(req.params.id);
     await prisma.user.delete({ where: { id: userId } });

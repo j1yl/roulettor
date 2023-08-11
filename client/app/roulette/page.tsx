@@ -5,9 +5,8 @@ type Props = {};
 
 const page = (props: Props) => {
   return (
-    <div className="flex flex-col gap-4 items-center justify-center w-full">
+    <div className="flex flex-col gap-4 p-4 items-center justify-center w-full">
       <Roulette />
-      <p>info</p>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import router from "./routes/router";
 
 const app = express();
 const corsOptions = {
-  origin: "*",
+  origin: process.env.CLIENT_URL,
 };
 
 app.use(express.json());

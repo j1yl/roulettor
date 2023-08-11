@@ -3,27 +3,45 @@
 @tailwind utilities;
 
 
-:root {
-  --black: #121212;
-  --red: #902D2D;
-  --green: #5F902D;
-  --gold: #FF8F28;
-  --text: #FBFBFB;
-  --background-darker: #17191C;
-  --background: #1F2225;
-  --background-100: #2D3237;
-  --background-200: #42484F;
-}
 
-body {
-  background: var(--background);
+@layer base {
+  :root {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --radius: 0.3rem;
+    --black: #303030;
+    --red: #902D2D;
+    --green: #5F902D;
+    --gold: #FF8F28;
+    --text: #FBFBFB;
+  }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
 @layer components {
   .rouletteslot {
     @apply w-[75px] h-[75px] m-[3px] rounded aspect-square flex justify-center items-center
-  }
-  .btn {
-    @apply px-4 py-2 w-max bg-100 text-sm rounded hover:bg-200 active:bg-100 transition-colors duration-200 ease-in-out cursor-pointer
   }
 }

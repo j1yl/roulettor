@@ -1,8 +1,12 @@
 import crypto from "crypto";
-import { Bet, RouletteGameState } from "./gameTypes";
-import prisma from "../db";
 import { Server } from "socket.io";
+
+import type { Bet, RouletteGameState } from "./gameTypes";
+
+import prisma from "../db";
 import { io } from "../server";
+
+export let nextGameStartTime: number;
 
 export let rouletteGameState: RouletteGameState = {
   rouletteNumber: null,
@@ -41,6 +45,7 @@ export async function placeBet(
 ) {
   const bet: Bet = { userId, amount, color };
   rouletteGameState.bets.push(bet);
+  await removeBalanceFromUser(userId, amount);
 }
 
 export function getBets() {
@@ -49,18 +54,24 @@ export function getBets() {
 
 export function evaluateBets() {
   console.log(`evaluating bets ${new Date().toLocaleTimeString()}`);
-  const winningNumber = randomRouletteNumber();
+  const winningNumber = rouletteGameState.rouletteNumber
+    ? rouletteGameState.rouletteNumber
+    : -1;
   let winningColor = "";
+
+  if (winningNumber % 2 === 0) {
+    winningColor = "black";
+  } else {
+    winningColor = "red";
+  }
 
   if (winningNumber === 0) {
     winningColor = "green";
-  } else if (winningNumber % 2 === 0) {
-    winningColor = "red";
-  } else {
-    winningColor = "black";
   }
 
-  rouletteGameState.bets.forEach((bet) => {
+  let unique = [...new Set(rouletteGameState.bets)];
+
+  unique.forEach((bet) => {
     let winnings: number = 0;
     if (bet.color === winningColor) {
       switch (winningColor) {
@@ -74,11 +85,12 @@ export function evaluateBets() {
           winnings = bet.amount * 14;
           break;
       }
-      console.log(`- ${bet.userId} won ${winnings}`);
+      console.log(`- ${bet.userId} won ${winnings} ${bet.color}`);
+      io.emit("winningBet", { userId: bet.userId, amount: bet.amount });
       addBalanceToUser(bet.userId, winnings);
     } else {
-      console.log(`- ${bet.userId} lost ${bet.amount}`);
-      removeBalanceFromUser(bet.userId, bet.amount);
+      console.log(`- ${bet.userId} lost ${bet.amount} ${bet.color}`);
+      io.emit("losingBet", { userId: bet.userId, amount: bet.amount });
     }
   });
 }
@@ -105,14 +117,15 @@ export async function addBalanceToUser(userId: string, amount: number) {
   });
 }
 
-export let nextGameStartTime: number;
-
 export function startGameLoop(io: Server) {
-  const gameInterval = 30000;
-  const pauseInterval = 5000;
+  const gameInterval = parseInt(process.env.GAME_INTERVAL as string);
 
   const runGame = async () => {
-    nextGameStartTime = Date.now() + gameInterval + pauseInterval;
+    spinTheWheel();
+    evaluateBets();
+    resetGame();
+
+    nextGameStartTime = Date.now() + gameInterval;
 
     console.log(
       "next game at",
@@ -121,13 +134,7 @@ export function startGameLoop(io: Server) {
 
     io.emit("nextGameStart", { nextGameStartTime });
 
-    setTimeout(() => {
-      spinTheWheel();
-      evaluateBets();
-      resetGame();
-
-      setTimeout(runGame, gameInterval);
-    }, pauseInterval);
+    setTimeout(runGame, gameInterval);
   };
 
   runGame();
