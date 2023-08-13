@@ -4,7 +4,7 @@
   "description": "the server for a multiplayer rouletto game",
   "main": "server.ts",
   "scripts": {
-    "start": "node server/src/server.ts",
+    "start": "nodemon server/src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
