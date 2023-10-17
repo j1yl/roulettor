@@ -28,11 +28,11 @@ const Navbar = (props: Props) => {
               <Link href="/roulette">Roll</Link>
             </Button>
           </li>
-          <li className="hidden md:block">
+          {/* <li className="hidden md:block">
             <Button asChild variant="link">
               <Link href="/lb">Leaderboard</Link>
             </Button>
-          </li>
+          </li> */}
         </ul>
       </div>
       <Button
@@ -59,9 +59,9 @@ const Navbar = (props: Props) => {
               <Link href="/roulette" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 Roll
               </Link>
-              <Link href="/roulette" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {/* <Link href="/roulette" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 FAQ
-              </Link>
+              </Link> */}
             </ul>
             {session?.user && (
               <div className="flex items-center gap-2">
